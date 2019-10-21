@@ -1,3 +1,3 @@
 # BWTools
 
-It include a [https://github.com/zenith391/BWTools/wiki](general documentation about BlocksWorld)
+It include a [general documentation about BlocksWorld](https://github.com/zenith391/BWTools/wiki) and some tools.
