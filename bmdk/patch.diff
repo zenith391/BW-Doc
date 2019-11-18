@@ -1,0 +1,2295 @@
+diff -aur bwsrc/AffineBidiIntFloatConverter.cs bwsrcMOD/AffineBidiIntFloatConverter.cs
+--- bwsrc/AffineBidiIntFloatConverter.cs	2019-10-13 10:39:16.000000000 +0200
++++ bwsrcMOD/AffineBidiIntFloatConverter.cs	2019-10-22 14:54:50.527240246 +0200
+@@ -8,12 +8,12 @@
+ 	// Token: 0x060014E2 RID: 5346 RVA: 0x00092D34 File Offset: 0x00091134
+ 	public AffineBidiIntFloatConverter()
+ 	{
+-		if (AffineBidiIntFloatConverter.<>f__mg$cache0 == null)
++		if (AffineBidiIntFloatConverter.f__mg_cache0 == null)
+ 		{
+-			AffineBidiIntFloatConverter.<>f__mg$cache0 = new Func<float, int>(Mathf.RoundToInt);
++			AffineBidiIntFloatConverter.f__mg_cache0 = new Func<float, int>(Mathf.RoundToInt);
+ 		}
+-		this.finalFloatToIntConverter = AffineBidiIntFloatConverter.<>f__mg$cache0;
+-		base..ctor();
++		this.finalFloatToIntConverter = AffineBidiIntFloatConverter.f__mg_cache0;
++		//base..ctor();
+ 		this.intToFloat = ((int i) => this.bias + this.multiplier * (float)i);
+ 		this.floatToInt = ((float f) => this.finalFloatToIntConverter((f - this.bias) / this.multiplier));
+ 	}
+@@ -51,5 +51,5 @@
+ 
+ 	// Token: 0x0400106E RID: 4206
+ 	[CompilerGenerated]
+-	private static Func<float, int> <>f__mg$cache0;
++	private static Func<float, int> f__mg_cache0;
+ }
+diff -aur bwsrc/AmplifyOcclusionBase.cs bwsrcMOD/AmplifyOcclusionBase.cs
+--- bwsrc/AmplifyOcclusionBase.cs	2019-10-13 10:39:02.000000000 +0200
++++ bwsrcMOD/AmplifyOcclusionBase.cs	2019-10-22 15:15:43.632529468 +0200
+@@ -547,7 +547,7 @@
+ 		}
+ 		else
+ 		{
+-			int pass = (int)(20 + this.SampleCount * (AmplifyOcclusionBase.SampleCountLevel)4 + (int)this.PerPixelNormals);
++			int pass = (int)(20 + (int)this.SampleCount * 4 + (int)this.PerPixelNormals);
+ 			if (this.Downsample)
+ 			{
+ 				cb.Blit(null, new RenderTargetIdentifier(num), this.m_occlusionMat, pass);
+@@ -574,9 +574,10 @@
+ 		if (this.Downsample && num >= 0)
+ 		{
+ 			this.SafeReleaseTemporaryRT(cb, num);
+-		}
+-		cb.SetRenderTarget(null);
+-	}
++		}
++
++        cb.SetRenderTarget(new RenderTargetIdentifier());
++    }
+ 
+ 	// Token: 0x06000020 RID: 32 RVA: 0x00003768 File Offset: 0x00001B68
+ 	private void CommandBuffer_FillApplyDeferred(CommandBuffer cb, AmplifyOcclusionBase.TargetDesc target, bool logTarget)
+@@ -602,7 +603,7 @@
+ 			this.SafeReleaseTemporaryRT(cb, num);
+ 			this.SafeReleaseTemporaryRT(cb, num2);
+ 		}
+-		cb.SetRenderTarget(null);
++		cb.SetRenderTarget(new RenderTargetIdentifier());
+ 	}
+ 
+ 	// Token: 0x06000021 RID: 33 RVA: 0x000038DC File Offset: 0x00001CDC
+@@ -622,18 +623,18 @@
+ 			this.SetBlitTarget(cb, BuiltinRenderTextureType.GBuffer3, target.fullWidth, target.fullHeight);
+ 			this.PerformBlit(cb, this.m_occlusionMat, 40);
+ 			this.SafeReleaseTemporaryRT(cb, num);
+-		}
+-		cb.SetRenderTarget(null);
+-	}
++		}
++        cb.SetRenderTarget(new RenderTargetIdentifier());
++    }
+ 
+ 	// Token: 0x06000022 RID: 34 RVA: 0x000039B8 File Offset: 0x00001DB8
+ 	private void CommandBuffer_FillApplyDebug(CommandBuffer cb, AmplifyOcclusionBase.TargetDesc target)
+ 	{
+ 		cb.SetGlobalTexture("_AO_OcclusionTexture", this.m_occlusionRT);
+ 		this.SetBlitTarget(cb, BuiltinRenderTextureType.CameraTarget, target.fullWidth, target.fullHeight);
+-		this.PerformBlit(cb, this.m_occlusionMat, 36);
+-		cb.SetRenderTarget(null);
+-	}
++		this.PerformBlit(cb, this.m_occlusionMat, 36);
++        cb.SetRenderTarget(new RenderTargetIdentifier());
++    }
+ 
+ 	// Token: 0x06000023 RID: 35 RVA: 0x00003A14 File Offset: 0x00001E14
+ 	private void CommandBuffer_Rebuild(AmplifyOcclusionBase.TargetDesc target)
+diff -aur bwsrc/Assembly-CSharp.csproj bwsrcMOD/Assembly-CSharp.csproj
+--- bwsrc/Assembly-CSharp.csproj	2019-10-13 12:33:29.000000000 +0200
++++ bwsrcMOD/Assembly-CSharp.csproj	2019-10-23 11:27:41.873037353 +0200
+@@ -12,21 +12,19 @@
+     <FileAlignment>512</FileAlignment>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+-    <PlatformTarget>AnyCPU</PlatformTarget>
+     <DebugSymbols>true</DebugSymbols>
+     <DebugType>full</DebugType>
+     <Optimize>false</Optimize>
+-    <OutputPath>bin\Debug\</OutputPath>
++    <OutputPath>..\..\..\.local\share\Steam\steamapps\common\Blocksworld\Blocksworld_Data\Managed</OutputPath>
+     <DefineConstants>DEBUG;TRACE</DefineConstants>
+     <ErrorReport>prompt</ErrorReport>
+     <WarningLevel>4</WarningLevel>
+-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+     <PlatformTarget>AnyCPU</PlatformTarget>
+     <DebugType>pdbonly</DebugType>
+     <Optimize>true</Optimize>
+-    <OutputPath>bin\Release\</OutputPath>
++    <OutputPath>..\..\..\.local\share\Steam\steamapps\common\Blocksworld\Blocksworld_Data\Managed</OutputPath>
+     <DefineConstants>TRACE</DefineConstants>
+     <ErrorReport>prompt</ErrorReport>
+     <WarningLevel>4</WarningLevel>
+@@ -42,10 +40,23 @@
+     </Reference>
+     <Reference Include="UnityEngine">
+       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Blocksworld\Blocksworld_Data\Managed\UnityEngine.dll</HintPath>
++      <Private>True</Private>
+     </Reference>
+     <Reference Include="UnityEngine.UI">
+       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Blocksworld\Blocksworld_Data\Managed\UnityEngine.UI.dll</HintPath>
+     </Reference>
++    <Reference Include="Assembly-CSharp-firstpass">
++      <HintPath>..\lib\Assembly-CSharp-firstpass.dll</HintPath>
++    </Reference>
++    <Reference Include="TextMeshPro-5.5-1.0.56-Runtime">
++      <HintPath>..\lib\TextMeshPro-5.5-1.0.56-Runtime.dll</HintPath>
++    </Reference>
++    <Reference Include="UnityEngine">
++      <HintPath>..\lib\UnityEngine.dll</HintPath>
++    </Reference>
++    <Reference Include="UnityEngine.UI">
++      <HintPath>..\lib\UnityEngine.UI.dll</HintPath>
++    </Reference>
+   </ItemGroup>
+   <ItemGroup>
+     <AppDesigner Include="Properties\" />
+@@ -1025,4 +1036,11 @@
+     <Compile Include="WorldUILayoutParameters.cs" />
+   </ItemGroup>
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
++  <ProjectExtensions>
++    <MonoDevelop>
++      <Properties>
++        <Deployment.LinuxDeployData generatePcFile="False" />
++      </Properties>
++    </MonoDevelop>
++  </ProjectExtensions>
+ </Project>
+\ Pas de fin de ligne à la fin du fichier
+Seulement dans bwsrcMOD: Assembly-CSharp.sln
+diff -aur bwsrc/BaseCardboardDevice.cs bwsrcMOD/BaseCardboardDevice.cs
+--- bwsrc/BaseCardboardDevice.cs	2019-10-13 10:39:02.000000000 +0200
++++ bwsrcMOD/BaseCardboardDevice.cs	2019-10-22 14:41:57.720309426 +0200
+@@ -59,11 +59,11 @@
+ 		byte[] bytes = Encoding.UTF8.GetBytes(Application.unityVersion);
+ 		BaseCardboardDevice.SetUnityVersion(bytes, bytes.Length);
+ 		BaseCardboardDevice.Start(displayMetrics.width, displayMetrics.height, displayMetrics.xdpi, displayMetrics.ydpi);
+-		if (BaseCardboardDevice.<>f__mg$cache0 == null)
++		if (BaseCardboardDevice.f__mg_cache0 == null)
+ 		{
+-			BaseCardboardDevice.<>f__mg$cache0 = new BaseCardboardDevice.VREventCallback(BaseCardboardDevice.OnVREvent);
++			BaseCardboardDevice.f__mg_cache0 = new BaseCardboardDevice.VREventCallback(BaseCardboardDevice.OnVREvent);
+ 		}
+-		BaseCardboardDevice.SetEventCallback(BaseCardboardDevice.<>f__mg$cache0);
++		BaseCardboardDevice.SetEventCallback(BaseCardboardDevice.f__mg_cache0);
+ 	}
+ 
+ 	// Token: 0x06000171 RID: 369 RVA: 0x000099A0 File Offset: 0x00007DA0
+@@ -359,7 +359,7 @@
+ 
+ 	// Token: 0x040001AB RID: 427
+ 	[CompilerGenerated]
+-	private static BaseCardboardDevice.VREventCallback <>f__mg$cache0;
++	private static BaseCardboardDevice.VREventCallback f__mg_cache0;
+ 
+ 	// Token: 0x0200002C RID: 44
+ 	// (Invoke) Token: 0x0600018E RID: 398
+Seulement dans bwsrcMOD/bin/Debug: Assembly-CSharp.dll
+Seulement dans bwsrcMOD/bin/Debug: Assembly-CSharp-firstpass.dll
+Seulement dans bwsrcMOD/bin/Debug: Assembly-CSharp.pdb
+Seulement dans bwsrcMOD/bin/Debug: TextMeshPro-5.5-1.0.56-Runtime.dll
+Seulement dans bwsrcMOD/bin/Debug: UnityEngine.dll
+Seulement dans bwsrcMOD/bin/Debug: UnityEngine.UI.dll
+diff -aur bwsrc/Blocks/BlockAbstractAntiGravity.cs bwsrcMOD/Blocks/BlockAbstractAntiGravity.cs
+--- bwsrc/Blocks/BlockAbstractAntiGravity.cs	2019-10-13 10:39:04.000000000 +0200
++++ bwsrcMOD/Blocks/BlockAbstractAntiGravity.cs	2019-10-22 15:31:37.140647854 +0200
+@@ -224,9 +224,9 @@
+ 		{
+ 			RaycastHit[] array = Physics.RaycastAll(pos, Vector3.down, maxDist);
+ 			Util.SmartSort(array, pos);
+-			foreach (RaycastHit hit in array)
++			foreach (RaycastHit hitt in array)
+ 			{
+-				Block block = BWSceneManager.FindBlock(hit.collider.gameObject, false);
++				Block block = BWSceneManager.FindBlock(hitt.collider.gameObject, false);
+ 				if (block != null)
+ 				{
+ 					if (block.isTerrain)
+diff -aur bwsrc/Blocks/BlockBillboard.cs bwsrcMOD/Blocks/BlockBillboard.cs
+--- bwsrc/Blocks/BlockBillboard.cs	2019-10-13 10:39:09.000000000 +0200
++++ bwsrcMOD/Blocks/BlockBillboard.cs	2019-10-22 15:26:01.981248908 +0200
+@@ -8,12 +8,12 @@
+ 	public class BlockBillboard : Block
+ 	{
+ 		// Token: 0x06000A97 RID: 2711 RVA: 0x0004C274 File Offset: 0x0004A674
+-		public BlockBillboard(List<List<Tile>> tiles)
+-		{
+-			Vector3 vector = new Vector3(0.4f, 1f, -4f);
++		public BlockBillboard(List<List<Tile>> tiles) : base(tiles)
++		{
++            Vector3 vector = new Vector3(0.4f, 1f, -4f);
+ 			this.offsetCamera = vector.normalized * 300f;
+-			this.scaleY = 1f;
+-			base..ctor(tiles);
++			this.scaleY = 1f;
++
+ 			this.parameters = this.GetBillboardParameters();
+ 			if (this.parameters.showLensflare)
+ 			{
+diff -aur bwsrc/Blocks/Block.cs bwsrcMOD/Blocks/Block.cs
+--- bwsrc/Blocks/Block.cs	2019-10-13 10:39:15.000000000 +0200
++++ bwsrcMOD/Blocks/Block.cs	2019-10-22 15:30:41.101393790 +0200
+@@ -149,134 +149,134 @@
+ 		// Token: 0x17000041 RID: 65
+ 		// (get) Token: 0x06000265 RID: 613 RVA: 0x0000E44A File Offset: 0x0000C84A
+ 		// (set) Token: 0x06000266 RID: 614 RVA: 0x0000E452 File Offset: 0x0000C852
+-		public string currentPaint { get; private set; }
+-
+-		// Token: 0x06000267 RID: 615 RVA: 0x0000E45C File Offset: 0x0000C85C
+-		public static void Register()
+-		{
+-			Block.predicateMoveTo = PredicateRegistry.Add<Block>("Block.MoveTo", null, (Block b) => new PredicateActionDelegate(b.MoveToAction), new Type[]
+-			{
+-				typeof(Vector3)
+-			}, null, null);
+-			Block.predicateRotateTo = PredicateRegistry.Add<Block>("Block.RotateTo", null, (Block b) => new PredicateActionDelegate(b.RotateToAction), new Type[]
+-			{
+-				typeof(Vector3)
+-			}, null, null);
+-			Block.predicateScaleTo = PredicateRegistry.Add<Block>("Block.ScaleTo", null, (Block b) => new PredicateActionDelegate(b.ScaleToAction), new Type[]
+-			{
+-				typeof(Vector3)
+-			}, null, null);
+-			Block.predicateTextureTo = PredicateRegistry.Add<Block>("Block.TextureTo", (Block b) => new PredicateSensorDelegate(b.IsTexturedTo), (Block b) => new PredicateActionDelegate(b.TextureToAction), new Type[]
+-			{
+-				typeof(string),
+-				typeof(Vector3),
+-				typeof(int)
+-			}, new string[]
+-			{
+-				"Texture name",
+-				"Normal",
+-				"Submesh index"
+-			}, null);
+-			Block.predicatePaintTo = PredicateRegistry.Add<Block>("Block.PaintTo", (Block b) => new PredicateSensorDelegate(b.IsPaintedTo), (Block b) => new PredicateActionDelegate(b.PaintToAction), new Type[]
+-			{
+-				typeof(string),
+-				typeof(int)
+-			}, new string[]
+-			{
+-				"Paint name",
+-				"Submesh index"
+-			}, null);
+-			Block.predicateGroup = PredicateRegistry.Add<Block>("Block.Group", null, (Block b) => new PredicateActionDelegate(b.IgnoreAction), new Type[]
+-			{
+-				typeof(int),
+-				typeof(string),
+-				typeof(int)
+-			}, new string[]
+-			{
+-				"Group ID",
+-				"Group type",
+-				"Main block"
+-			}, null);
+-			Block.predicateSetFog = PredicateRegistry.Add<Block>("Block.SetFog", null, (Block b) => new PredicateActionDelegate(b.SetFogAction), new Type[]
+-			{
+-				typeof(string),
+-				typeof(string),
+-				typeof(string)
+-			}, null, null);
+-			PredicateRegistry.Add<Block>("Block.PaintSkyTo", (Block b) => new PredicateSensorDelegate(b.IsSkyPaintedTo), (Block b) => new PredicateActionDelegate(b.PaintSkyToAction), new Type[]
+-			{
+-				typeof(string),
+-				typeof(int)
+-			}, null, null);
+-			PredicateRegistry.Add<Block>("Error", (Block b) => new PredicateSensorDelegate(b.IgnoreSensor), (Block b) => new PredicateActionDelegate(b.IgnoreAction), new Type[]
+-			{
+-				typeof(string)
+-			}, new string[]
+-			{
+-				"Message"
+-			}, null);
+-			Block.predicateGameOver = PredicateRegistry.Add<Block>("Meta.GameOver", null, (Block b) => new PredicateActionDelegate(b.GameOver), new Type[]
+-			{
+-				typeof(string),
+-				typeof(float),
+-				typeof(string)
+-			}, new string[]
++		public string currentPaint { get; private set; }
++
++        // Token: 0x06000267 RID: 615 RVA: 0x0000E45C File Offset: 0x0000C85C
++        public static void Register()
++        {
++            Block.predicateMoveTo = PredicateRegistry.Add<Block>("Block.MoveTo", null, (Block b) => new PredicateActionDelegate(b.MoveToAction), new Type[]
++            {
++                typeof(Vector3)
++            }, null, null);
++            Block.predicateRotateTo = PredicateRegistry.Add<Block>("Block.RotateTo", null, (Block b) => new PredicateActionDelegate(b.RotateToAction), new Type[]
++            {
++                typeof(Vector3)
++            }, null, null);
++            Block.predicateScaleTo = PredicateRegistry.Add<Block>("Block.ScaleTo", null, (Block b) => new PredicateActionDelegate(b.ScaleToAction), new Type[]
++            {
++                typeof(Vector3)
++            }, null, null);
++            Block.predicateTextureTo = PredicateRegistry.Add<Block>("Block.TextureTo", (Block b) => new PredicateSensorDelegate(b.IsTexturedTo), (Block b) => new PredicateActionDelegate(b.TextureToAction), new Type[]
++            {
++                typeof(string),
++                typeof(Vector3),
++                typeof(int)
++            }, new string[]
++            {
++                "Texture name",
++                "Normal",
++                "Submesh index"
++            }, null);
++            Block.predicatePaintTo = PredicateRegistry.Add<Block>("Block.PaintTo", (Block b) => new PredicateSensorDelegate(b.IsPaintedTo), (Block b) => new PredicateActionDelegate(b.PaintToAction), new Type[]
++            {
++                typeof(string),
++                typeof(int)
++            }, new string[]
++            {
++                "Paint name",
++                "Submesh index"
++            }, null);
++            Block.predicateGroup = PredicateRegistry.Add<Block>("Block.Group", null, (Block b) => new PredicateActionDelegate(b.IgnoreAction), new Type[]
++            {
++                typeof(int),
++                typeof(string),
++                typeof(int)
++            }, new string[]
++            {
++                "Group ID",
++                "Group type",
++                "Main block"
++            }, null);
++            Block.predicateSetFog = PredicateRegistry.Add<Block>("Block.SetFog", null, (Block b) => new PredicateActionDelegate(b.SetFogAction), new Type[]
++            {
++                typeof(string),
++                typeof(string),
++                typeof(string)
++            }, null, null);
++            PredicateRegistry.Add<Block>("Block.PaintSkyTo", (Block b) => new PredicateSensorDelegate(b.IsSkyPaintedTo), (Block b) => new PredicateActionDelegate(b.PaintSkyToAction), new Type[]
++            {
++                typeof(string),
++                typeof(int)
++            }, null, null);
++            PredicateRegistry.Add<Block>("Error", (Block b) => new PredicateSensorDelegate(b.IgnoreSensor), (Block b) => new PredicateActionDelegate(b.IgnoreAction), new Type[]
++            {
++                typeof(string)
++            }, new string[]
++            {
++                "Message"
++            }, null);
++            Block.predicateGameOver = PredicateRegistry.Add<Block>("Meta.GameOver", null, (Block b) => new PredicateActionDelegate(b.GameOver), new Type[]
++            {
++                typeof(string),
++                typeof(float),
++                typeof(string)
++            }, new string[]
++            {
++                "Message",
++                "Duration",
++                "SFX"
++            }, null);
++            Block.predicateGameWin = PredicateRegistry.Add<Block>("Meta.GameWin", null, (Block b) => new PredicateActionDelegate(b.GameWin), new Type[]
++            {
++                typeof(string),
++                typeof(float),
++                typeof(string)
++            }, new string[]
++            {
++                "Message",
++                "Duration",
++                "SFX"
++            }, null);
++            Block.predicateGameLose = PredicateRegistry.Add<Block>("Meta.GameLose", null, (Block b) => new PredicateActionDelegate(b.GameLose), new Type[]
++            {
++                typeof(string),
++                typeof(float),
++                typeof(string)
++            }, new string[]
++            {
++                "Message",
++                "Duration",
++                "SFX"
++            }, null);
++            Block.noTilesAfterPredicates.Add(Block.predicateGameOver);
++            Block.noTilesAfterPredicates.Add(Block.predicateGameWin);
++            Block.noTilesAfterPredicates.Add(Block.predicateGameLose);
++            Block.predicateTag = PredicateRegistry.Add<Block>("Position.Position", null, (Block b) => new PredicateActionDelegate(b.RegisterTag), new Type[]
++            {
++                typeof(string)
++            }, null, null);
++            Block.predicateWithinTaggedBlock = PredicateRegistry.Add<Block>("Position.IsWithin", (Block b) => new PredicateSensorDelegate(b.WithinTaggedBlock), null, new Type[]
++            {
++                typeof(string)
++            }, null, null);
++            Block.predicateCustomTag = PredicateRegistry.Add<Block>("Block.CustomTag", null, (Block b) => new PredicateActionDelegate(b.RegisterTag), new Type[]
++            {
++                typeof(string)
++            }, null, null);
++            PredicateRegistry.Add<Block>("Variables.GlobalBooleanVariableEquals", delegate (Block b)
++            {
++                if (Block.f__mg_cache0 == null)
++                {
++                    Block.f__mg_cache0 = new PredicateSensorDelegate(VariableManager.GlobalBooleanVariableValueEquals);
++                }
++                return Block.f__mg_cache0;
++            }, delegate(Block b)
+ 			{
+-				"Message",
+-				"Duration",
+-				"SFX"
+-			}, null);
+-			Block.predicateGameWin = PredicateRegistry.Add<Block>("Meta.GameWin", null, (Block b) => new PredicateActionDelegate(b.GameWin), new Type[]
+-			{
+-				typeof(string),
+-				typeof(float),
+-				typeof(string)
+-			}, new string[]
+-			{
+-				"Message",
+-				"Duration",
+-				"SFX"
+-			}, null);
+-			Block.predicateGameLose = PredicateRegistry.Add<Block>("Meta.GameLose", null, (Block b) => new PredicateActionDelegate(b.GameLose), new Type[]
+-			{
+-				typeof(string),
+-				typeof(float),
+-				typeof(string)
+-			}, new string[]
+-			{
+-				"Message",
+-				"Duration",
+-				"SFX"
+-			}, null);
+-			Block.noTilesAfterPredicates.Add(Block.predicateGameOver);
+-			Block.noTilesAfterPredicates.Add(Block.predicateGameWin);
+-			Block.noTilesAfterPredicates.Add(Block.predicateGameLose);
+-			Block.predicateTag = PredicateRegistry.Add<Block>("Position.Position", null, (Block b) => new PredicateActionDelegate(b.RegisterTag), new Type[]
+-			{
+-				typeof(string)
+-			}, null, null);
+-			Block.predicateWithinTaggedBlock = PredicateRegistry.Add<Block>("Position.IsWithin", (Block b) => new PredicateSensorDelegate(b.WithinTaggedBlock), null, new Type[]
+-			{
+-				typeof(string)
+-			}, null, null);
+-			Block.predicateCustomTag = PredicateRegistry.Add<Block>("Block.CustomTag", null, (Block b) => new PredicateActionDelegate(b.RegisterTag), new Type[]
+-			{
+-				typeof(string)
+-			}, null, null);
+-			PredicateRegistry.Add<Block>("Variables.GlobalBooleanVariableEquals", delegate(Block b)
+-			{
+-				if (Block.<>f__mg$cache0 == null)
++				if (Block.f__mg_cache1 == null)
+ 				{
+-					Block.<>f__mg$cache0 = new PredicateSensorDelegate(VariableManager.GlobalBooleanVariableValueEquals);
++					Block.f__mg_cache1 = new PredicateActionDelegate(VariableManager.SetGlobalBooleanVariableValue);
+ 				}
+-				return Block.<>f__mg$cache0;
+-			}, delegate(Block b)
+-			{
+-				if (Block.<>f__mg$cache1 == null)
+-				{
+-					Block.<>f__mg$cache1 = new PredicateActionDelegate(VariableManager.SetGlobalBooleanVariableValue);
+-				}
+-				return Block.<>f__mg$cache1;
++				return Block.f__mg_cache1;
+ 			}, new Type[]
+ 			{
+ 				typeof(string),
+@@ -288,18 +288,18 @@
+ 			}, null);
+ 			PredicateRegistry.Add<Block>("Variables.GlobalIntegerVariableEquals", delegate(Block b)
+ 			{
+-				if (Block.<>f__mg$cache2 == null)
++				if (Block.f__mg_cache2 == null)
+ 				{
+-					Block.<>f__mg$cache2 = new PredicateSensorDelegate(VariableManager.GlobalIntegerVariableValueEquals);
++					Block.f__mg_cache2 = new PredicateSensorDelegate(VariableManager.GlobalIntegerVariableValueEquals);
+ 				}
+-				return Block.<>f__mg$cache2;
++				return Block.f__mg_cache2;
+ 			}, delegate(Block b)
+ 			{
+-				if (Block.<>f__mg$cache3 == null)
++				if (Block.f__mg_cache3 == null)
+ 				{
+-					Block.<>f__mg$cache3 = new PredicateActionDelegate(VariableManager.SetGlobalIntegerVariableValue);
++					Block.f__mg_cache3 = new PredicateActionDelegate(VariableManager.SetGlobalIntegerVariableValue);
+ 				}
+-				return Block.<>f__mg$cache3;
++				return Block.f__mg_cache3;
+ 			}, new Type[]
+ 			{
+ 				typeof(string),
+@@ -311,11 +311,11 @@
+ 			}, null);
+ 			PredicateRegistry.Add<Block>("Variables.RandomizeGlobalIntegerVariable", null, delegate(Block b)
+ 			{
+-				if (Block.<>f__mg$cache4 == null)
++				if (Block.f__mg_cache4 == null)
+ 				{
+-					Block.<>f__mg$cache4 = new PredicateActionDelegate(VariableManager.RandomizeGlobalIntegerVariable);
++					Block.f__mg_cache4 = new PredicateActionDelegate(VariableManager.RandomizeGlobalIntegerVariable);
+ 				}
+-				return Block.<>f__mg$cache4;
++				return Block.f__mg_cache4;
+ 			}, new Type[]
+ 			{
+ 				typeof(string),
+@@ -329,11 +329,11 @@
+ 			}, null);
+ 			PredicateRegistry.Add<Block>("Variables.IncrementIntegerVariable", null, delegate(Block b)
+ 			{
+-				if (Block.<>f__mg$cache5 == null)
++				if (Block.f__mg_cache5 == null)
+ 				{
+-					Block.<>f__mg$cache5 = new PredicateActionDelegate(VariableManager.IncrementIntegerVariable);
++					Block.f__mg_cache5 = new PredicateActionDelegate(VariableManager.IncrementIntegerVariable);
+ 				}
+-				return Block.<>f__mg$cache5;
++				return Block.f__mg_cache5;
+ 			}, new Type[]
+ 			{
+ 				typeof(string),
+@@ -5755,9 +5755,9 @@
+ 			bool flag;
+ 			if (text != null)
+ 			{
+-				if (Block.<>f__switch$map3 == null)
++				if (Block.f__switch_map3 == null)
+ 				{
+-					Block.<>f__switch$map3 = new Dictionary<string, int>(12)
++					Block.f__switch_map3 = new Dictionary<string, int>(12)
+ 					{
+ 						{
+ 							"Cylinder",
+@@ -5810,7 +5810,7 @@
+ 					};
+ 				}
+ 				int num;
+-				if (Block.<>f__switch$map3.TryGetValue(text, out num))
++				if (Block.f__switch_map3.TryGetValue(text, out num))
+ 				{
+ 					if (num == 0)
+ 					{
+@@ -7211,22 +7211,22 @@
+ 		// Token: 0x0600034B RID: 843 RVA: 0x0001ECCC File Offset: 0x0001D0CC
+ 		public void PlayPositionedSound(string sfxName, float volume = 1f, float pitch = 1f)
+ 		{
+-			if (Block.<>f__mg$cache6 == null)
++			if (Block.f__mg_cache6 == null)
+ 			{
+-				Block.<>f__mg$cache6 = new Action<Block, string, float, float>(Block.PlayPositionedSoundNow);
++				Block.f__mg_cache6 = new Action<Block, string, float, float>(Block.PlayPositionedSoundNow);
+ 			}
+-			DelegateCommand<Block, string, float, float> c = new DelegateCommand<Block, string, float, float>(this, sfxName, volume, pitch, Block.<>f__mg$cache6);
++			DelegateCommand<Block, string, float, float> c = new DelegateCommand<Block, string, float, float>(this, sfxName, volume, pitch, Block.f__mg_cache6);
+ 			Blocksworld.AddFixedUpdateCommand(c);
+ 		}
+ 
+ 		// Token: 0x0600034C RID: 844 RVA: 0x0001ED08 File Offset: 0x0001D108
+ 		public void PlayPositionedSoundAfterDelay(int delay, string sfxName, float volume = 1f, float pitch = 1f)
+ 		{
+-			if (Block.<>f__mg$cache7 == null)
++			if (Block.f__mg_cache7 == null)
+ 			{
+-				Block.<>f__mg$cache7 = new Action<Block, string, float, float>(Block.PlayPositionedSoundNow);
++				Block.f__mg_cache7 = new Action<Block, string, float, float>(Block.PlayPositionedSoundNow);
+ 			}
+-			DelayedDelegateCommand<Block, string, float, float> c = new DelayedDelegateCommand<Block, string, float, float>(this, sfxName, volume, pitch, Block.<>f__mg$cache7, delay);
++			DelayedDelegateCommand<Block, string, float, float> c = new DelayedDelegateCommand<Block, string, float, float>(this, sfxName, volume, pitch, Block.f__mg_cache7, delay);
+ 			Blocksworld.AddFixedUpdateCommand(c);
+ 		}
+ 
+@@ -8313,11 +8313,11 @@
+ 				this.vanished = false;
+ 				this.SetKinematicIfSingletonOrLegs(false);
+ 				this.Appeared();
+-				if (Block.<>f__mg$cache8 == null)
++				if (Block.f__mg_cache8 == null)
+ 				{
+-					Block.<>f__mg$cache8 = new Action<Block>(Block.BlockModelBlockAppeared);
++					Block.f__mg_cache8 = new Action<Block>(Block.BlockModelBlockAppeared);
+ 				}
+-				this.DoWithNonVanishingOrAppearingModelBlocks(Block.<>f__mg$cache8);
++				this.DoWithNonVanishingOrAppearingModelBlocks(Block.f__mg_cache8);
+ 				Block.vanishingOrAppearingBlocks.Remove(this);
+ 				if (!this.isTreasure)
+ 				{
+@@ -14974,40 +14974,43 @@
+ 		// Token: 0x04000339 RID: 825
+ 		private static HashSet<Predicate> emptyPredicateSet = new HashSet<Predicate>();
+ 
+-		// Token: 0x0400033A RID: 826
+-		[CompilerGenerated]
+-		private static PredicateSensorDelegate <>f__mg$cache0;
++        [CompilerGenerated]
++        private static Dictionary<string, int> f__switch_map3;
++
++        // Token: 0x0400033A RID: 826
++        [CompilerGenerated]
++		private static PredicateSensorDelegate f__mg_cache0;
+ 
+ 		// Token: 0x0400033B RID: 827
+ 		[CompilerGenerated]
+-		private static PredicateActionDelegate <>f__mg$cache1;
++		private static PredicateActionDelegate f__mg_cache1;
+ 
+ 		// Token: 0x0400033C RID: 828
+ 		[CompilerGenerated]
+-		private static PredicateSensorDelegate <>f__mg$cache2;
++		private static PredicateSensorDelegate f__mg_cache2;
+ 
+ 		// Token: 0x0400033D RID: 829
+ 		[CompilerGenerated]
+-		private static PredicateActionDelegate <>f__mg$cache3;
++		private static PredicateActionDelegate f__mg_cache3;
+ 
+ 		// Token: 0x0400033E RID: 830
+ 		[CompilerGenerated]
+-		private static PredicateActionDelegate <>f__mg$cache4;
++		private static PredicateActionDelegate f__mg_cache4;
+ 
+ 		// Token: 0x0400033F RID: 831
+ 		[CompilerGenerated]
+-		private static PredicateActionDelegate <>f__mg$cache5;
++		private static PredicateActionDelegate f__mg_cache5;
+ 
+ 		// Token: 0x04000492 RID: 1170
+ 		[CompilerGenerated]
+-		private static Action<Block, string, float, float> <>f__mg$cache6;
++		private static Action<Block, string, float, float> f__mg_cache6;
+ 
+ 		// Token: 0x04000493 RID: 1171
+ 		[CompilerGenerated]
+-		private static Action<Block, string, float, float> <>f__mg$cache7;
++		private static Action<Block, string, float, float> f__mg_cache7;
+ 
+ 		// Token: 0x04000495 RID: 1173
+ 		[CompilerGenerated]
+-		private static Action<Block> <>f__mg$cache8;
++		private static Action<Block> f__mg_cache8;
+ 	}
+ }
+diff -aur bwsrc/Blocks/BlockEmitter.cs bwsrcMOD/Blocks/BlockEmitter.cs
+--- bwsrc/Blocks/BlockEmitter.cs	2019-10-13 10:39:07.000000000 +0200
++++ bwsrcMOD/Blocks/BlockEmitter.cs	2019-10-22 14:42:19.648052186 +0200
+@@ -29,11 +29,11 @@
+ 			PredicateRegistry.Add<BlockEmitter>("Emitter.EmitFast", null, (Block b) => new PredicateActionDelegate(((BlockEmitter)b).EmitFast), null, null, null);
+ 			PredicateRegistry.Add<BlockEmitter>("Emitter.EmitSmoke", null, (Block b) => new PredicateActionDelegate(((BlockEmitter)b).EmitSmoke), null, null, null);
+ 			string name = "Emitter.HitByParticle";
+-			if (BlockEmitter.<>f__mg$cache0 == null)
++			if (BlockEmitter.f__mg_cache0 == null)
+ 			{
+-				BlockEmitter.<>f__mg$cache0 = new PredicateSensorConstructorDelegate(BlockEmitter.IsHitByParticle);
++				BlockEmitter.f__mg_cache0 = new PredicateSensorConstructorDelegate(BlockEmitter.IsHitByParticle);
+ 			}
+-			PredicateRegistry.Add<Block>(name, BlockEmitter.<>f__mg$cache0, null, null, null, null);
++			PredicateRegistry.Add<Block>(name, BlockEmitter.f__mg_cache0, null, null, null, null);
+ 		}
+ 
+ 		// Token: 0x06000B88 RID: 2952 RVA: 0x000535D4 File Offset: 0x000519D4
+@@ -161,6 +161,6 @@
+ 
+ 		// Token: 0x04000930 RID: 2352
+ 		[CompilerGenerated]
+-		private static PredicateSensorConstructorDelegate <>f__mg$cache0;
++		private static PredicateSensorConstructorDelegate f__mg_cache0;
+ 	}
+ }
+diff -aur bwsrc/Blocks/BlockGravityGun.cs bwsrcMOD/Blocks/BlockGravityGun.cs
+--- bwsrc/Blocks/BlockGravityGun.cs	2019-10-13 10:39:08.000000000 +0200
++++ bwsrcMOD/Blocks/BlockGravityGun.cs	2019-10-22 14:42:38.335832952 +0200
+@@ -48,11 +48,11 @@
+ 			PredicateRegistry.Add<BlockGravityGun>("GravityGun.Repel", null, (Block b) => new PredicateActionDelegate(((BlockGravityGun)b).Repel), null, null, null);
+ 			PredicateRegistry.Add<BlockGravityGun>("GravityGun.Attract", null, (Block b) => new PredicateActionDelegate(((BlockGravityGun)b).Attract), null, null, null);
+ 			string name = "GravityGun.HitBy";
+-			if (BlockGravityGun.<>f__mg$cache0 == null)
++			if (BlockGravityGun.f__mg_cache0 == null)
+ 			{
+-				BlockGravityGun.<>f__mg$cache0 = new PredicateSensorConstructorDelegate(BlockGravityGun.IsHitByGravityGun);
++				BlockGravityGun.f__mg_cache0 = new PredicateSensorConstructorDelegate(BlockGravityGun.IsHitByGravityGun);
+ 			}
+-			PredicateRegistry.Add<Block>(name, BlockGravityGun.<>f__mg$cache0, null, null, null, null);
++			PredicateRegistry.Add<Block>(name, BlockGravityGun.f__mg_cache0, null, null, null, null);
+ 		}
+ 
+ 		// Token: 0x06000BF9 RID: 3065 RVA: 0x00055930 File Offset: 0x00053D30
+@@ -196,6 +196,6 @@
+ 
+ 		// Token: 0x04000990 RID: 2448
+ 		[CompilerGenerated]
+-		private static PredicateSensorConstructorDelegate <>f__mg$cache0;
++		private static PredicateSensorConstructorDelegate f__mg_cache0;
+ 	}
+ }
+diff -aur bwsrc/Blocks/BlockQuadped.cs bwsrcMOD/Blocks/BlockQuadped.cs
+--- bwsrc/Blocks/BlockQuadped.cs	2019-10-13 10:39:10.000000000 +0200
++++ bwsrcMOD/Blocks/BlockQuadped.cs	2019-10-22 15:30:11.801786941 +0200
+@@ -7,29 +7,29 @@
+ 	// Token: 0x020000C0 RID: 192
+ 	public class BlockQuadped : BlockAbstractLegs
+ 	{
+-		// Token: 0x06000EC4 RID: 3780 RVA: 0x00063704 File Offset: 0x00061B04
+-		public BlockQuadped(List<List<Tile>> tiles, Dictionary<string, string> partNames = null, float ankleYSeparator = 0f, float footWidth = 0.25f)
++        private static int legPairCount_ = 2;
++        private static float[] legPairOffsets_ = new float[]
++        {
++                0.35f,
++                -0.35f
++        };
++        private static int[][] legPairIndices_ = new int[][]
++        {
++                new int[]
++                {
++                    0,
++                    1
++                },
++                new int[]
++                {
++                    3,
++                    2
++                }
++        };
++        // Token: 0x06000EC4 RID: 3780 RVA: 0x00063704 File Offset: 0x00061B04
++        public BlockQuadped(List<List<Tile>> tiles, Dictionary<string, string> partNames = null, float ankleYSeparator = 0f, float footWidth = 0.25f) :
++            base(tiles, partNames, legPairCount_, legPairOffsets_, legPairIndices_, ankleYSeparator, false, 1f, footWidth)
+ 		{
+-			int legPairCount = 2;
+-			float[] legPairOffsets = new float[]
+-			{
+-				0.35f,
+-				-0.35f
+-			};
+-			int[][] legPairIndices = new int[][]
+-			{
+-				new int[]
+-				{
+-					0,
+-					1
+-				},
+-				new int[]
+-				{
+-					3,
+-					2
+-				}
+-			};
+-			base..ctor(tiles, partNames, legPairCount, legPairOffsets, legPairIndices, ankleYSeparator, false, 1f, footWidth);
+ 			this.maxStepHeight = 0.85f;
+ 			this.maxStepLength = 1f;
+ 			this.stepLengthMultiplier = 0.7f;
+diff -aur bwsrc/Blocks/BlockSteeringWheel.cs bwsrcMOD/Blocks/BlockSteeringWheel.cs
+--- bwsrc/Blocks/BlockSteeringWheel.cs	2019-10-13 10:39:13.000000000 +0200
++++ bwsrcMOD/Blocks/BlockSteeringWheel.cs	2019-10-22 15:30:59.533147602 +0200
+@@ -8,13 +8,12 @@
+ 	public class BlockSteeringWheel : Block
+ 	{
+ 		// Token: 0x06000FCB RID: 4043 RVA: 0x00069C00 File Offset: 0x00068000
+-		public BlockSteeringWheel(List<List<Tile>> tiles)
++		public BlockSteeringWheel(List<List<Tile>> tiles) : base(tiles)
+ 		{
+ 			Vector3 vector = new Vector3(0f, 0f, -1f);
+ 			this.localSteeringAxle = vector.normalized;
+ 			this.meshesToTurn = new List<Transform>();
+ 			this.wheelsBounds = default(Bounds);
+-			base..ctor(tiles);
+ 			this.meshesToTurn.Add(this.goT.Find("DrivingWheel SW"));
+ 			this.meshesToTurn.Add(this.goT.Find("CarHorn SW"));
+ 			this.meshesToTurn.Add(this.goT.Find("SteeringWheelConnect SW"));
+diff -aur bwsrc/Blocks/BlockWater.cs bwsrcMOD/Blocks/BlockWater.cs
+--- bwsrc/Blocks/BlockWater.cs	2019-10-13 10:39:13.000000000 +0200
++++ bwsrcMOD/Blocks/BlockWater.cs	2019-10-22 15:35:28.257639790 +0200
+@@ -247,9 +247,9 @@
+ 		{
+ 			if (texture != null)
+ 			{
+-				if (BlockWater.<>f__switch$map4 == null)
++				if (BlockWater.f__switch_map4 == null)
+ 				{
+-					BlockWater.<>f__switch$map4 = new Dictionary<string, int>(19)
++					BlockWater.f__switch_map4 = new Dictionary<string, int>(19)
+ 					{
+ 						{
+ 							"Plain",
+@@ -330,7 +330,7 @@
+ 					};
+ 				}
+ 				int num;
+-				if (BlockWater.<>f__switch$map4.TryGetValue(texture, out num))
++				if (BlockWater.f__switch_map4.TryGetValue(texture, out num))
+ 				{
+ 					if (num == 0)
+ 					{
+@@ -779,8 +779,10 @@
+ 			return this.fogMultiplier;
+ 		}
+ 
+-		// Token: 0x04000DE0 RID: 3552
+-		private Dictionary<int, BlockWaterInfo> blockInfos;
++        private static Dictionary<string, int> f__switch_map4;
++
++        // Token: 0x04000DE0 RID: 3552
++        private Dictionary<int, BlockWaterInfo> blockInfos;
+ 
+ 		// Token: 0x04000DE1 RID: 3553
+ 		private List<BlockWaterInfo> blockInfoList;
+diff -aur bwsrc/Blocksworld.cs bwsrcMOD/Blocksworld.cs
+--- bwsrc/Blocksworld.cs	2019-10-13 10:39:26.000000000 +0200
++++ bwsrcMOD/Blocksworld.cs	2019-10-23 10:44:27.257109113 +0200
+@@ -132,8 +132,8 @@
+ 
+ 	// Token: 0x060018E7 RID: 6375 RVA: 0x000AFCC0 File Offset: 0x000AE0C0
+ 	private IEnumerator Start()
+-	{
+-		yield return null;
++	{
++        yield return null;
+ 		TiltManager.Instance.Init();
+ 		PerformaceTest speedTest = new PerformaceTest("Load Main Scene");
+ 		speedTest.Start();
+@@ -349,7 +349,7 @@
+ 			characterEditExitGesture
+ 		};
+ 		Blocksworld.recognizer.AddGesture(Blocksworld.uiGesture);
+-		foreach (BaseGesture array2 in new BaseGesture[][]
++		foreach (BaseGesture[] array2 in new BaseGesture[][]
+ 		{
+ 			panelLayer,
+ 			buttonLayer,
+@@ -416,8 +416,8 @@
+ 		}
+ 		Blocksworld.isLoadingScene = false;
+ 		Blocksworld.loadComplete = true;
+-		speedTest.Stop();
+-		speedTest.DebugLogTestResults();
++		speedTest.Stop();
++        speedTest.DebugLogTestResults();
+ 		yield break;
+ 	}
+ 
+@@ -1055,8 +1055,8 @@
+ 				}
+ 			}
+ 		}
+-		Tutorial.OnHudMesh();
+-	}
++		Tutorial.OnHudMesh();
++    }
+ 
+ 	// Token: 0x06001902 RID: 6402 RVA: 0x000B0E00 File Offset: 0x000AF200
+ 	private void ExecuteOnHudMesh(List<Command> commands)
+@@ -3678,8 +3678,8 @@
+ 
+ 	// Token: 0x0600194E RID: 6478 RVA: 0x000B6314 File Offset: 0x000B4714
+ 	private void Update()
+-	{
+-		if (!Blocksworld.IsStarted())
++	{
++        if (!Blocksworld.IsStarted())
+ 		{
+ 			return;
+ 		}
+diff -aur bwsrc/BWAPIRequestBase.cs bwsrcMOD/BWAPIRequestBase.cs
+--- bwsrc/BWAPIRequestBase.cs	2019-10-13 10:39:02.000000000 +0200
++++ bwsrcMOD/BWAPIRequestBase.cs	2019-10-22 19:23:15.298295666 +0200
+@@ -24,10 +24,10 @@
+ 	// Token: 0x060001D0 RID: 464 RVA: 0x0000A5A9 File Offset: 0x000089A9
+ 	public virtual void Send()
+ 	{
+-	}
+-
+-	// Token: 0x060001D1 RID: 465 RVA: 0x0000A5AB File Offset: 0x000089AB
+-	public virtual void SendOwnerCoroutine(MonoBehaviour owner)
++	}
++
++    // Token: 0x060001D1 RID: 465 RVA: 0x0000A5AB File Offset: 0x000089AB
++    public virtual void SendOwnerCoroutine(MonoBehaviour owner)
+ 	{
+ 	}
+ 
+diff -aur bwsrc/BWAPIRequest_Standalone.cs bwsrcMOD/BWAPIRequest_Standalone.cs
+--- bwsrc/BWAPIRequest_Standalone.cs	2019-10-13 10:39:03.000000000 +0200
++++ bwsrcMOD/BWAPIRequest_Standalone.cs	2019-11-17 15:03:30.004657339 +0100
+@@ -1,332 +1,345 @@
+-﻿using System;
+-using System.Collections;
+-using System.Collections.Generic;
+-using System.Text;
+-using System.Threading;
+-using SimpleJSON;
+-using UnityEngine;
+-using UnityEngine.Networking;
+-
+-// Token: 0x02000037 RID: 55
+-public class BWAPIRequest_Standalone : BWAPIRequestBase
+-{
+-	// Token: 0x060001EA RID: 490 RVA: 0x0000A9A9 File Offset: 0x00008DA9
+-	public BWAPIRequest_Standalone(string method, string path)
+-	{
+-		this.Method = this.validHttpMethod(method);
+-		this.Path = path;
+-		this.headers = new Dictionary<string, string>();
+-	}
+-
+-	// Token: 0x060001EB RID: 491 RVA: 0x0000A9D0 File Offset: 0x00008DD0
+-	private static string currentUserAuthToken()
+-	{
+-		string result = string.Empty;
+-		if (BWUser.currentUser != null)
+-		{
+-			result = BWUser.currentUser.authToken;
+-		}
+-		return result;
+-	}
+-
+-	// Token: 0x060001EC RID: 492 RVA: 0x0000A9F9 File Offset: 0x00008DF9
+-	public static string ApiBaseUrl()
+-	{
+-		return BWEnvConfig.API_BASE_URL;
+-	}
+-
+-	// Token: 0x060001ED RID: 493 RVA: 0x0000AA00 File Offset: 0x00008E00
+-	public override void AddParam(string key, string valueStr)
+-	{
+-		if (this.Method == "GET" || this.Method == "DELETE")
+-		{
+-			string text = (!this.Path.Contains("?")) ? "?" : "&";
+-			this.Path = string.Concat(new string[]
+-			{
+-				this.Path,
+-				text,
+-				key,
+-				"=",
+-				valueStr
+-			});
+-		}
+-		else
+-		{
+-			if (this.form == null)
+-			{
+-				this.form = new WWWForm();
+-			}
+-			this.form.AddField(key, valueStr);
+-		}
+-	}
+-
+-	// Token: 0x060001EE RID: 494 RVA: 0x0000AAB2 File Offset: 0x00008EB2
+-	public override void AddJsonParameters(string jsonStr)
+-	{
+-		this.jsonParamStr = jsonStr;
+-	}
+-
+-	// Token: 0x060001EF RID: 495 RVA: 0x0000AABB File Offset: 0x00008EBB
+-	public override void AddImageData(string key, byte[] data, string filename, string mimeType)
+-	{
+-		if (this.form == null)
+-		{
+-			this.form = new WWWForm();
+-		}
+-		this.form.AddBinaryData(key, data, filename, mimeType);
+-	}
+-
+-	// Token: 0x060001F0 RID: 496 RVA: 0x0000AAE3 File Offset: 0x00008EE3
+-	public override void Send()
+-	{
+-		Blocksworld.bw.StartCoroutine(this.SendCoroutine());
+-	}
+-
+-	// Token: 0x060001F1 RID: 497 RVA: 0x0000AAF6 File Offset: 0x00008EF6
+-	public override void SendOwnerCoroutine(MonoBehaviour owner)
+-	{
+-		owner.StartCoroutine(this.SendCoroutine());
+-	}
+-
+-	// Token: 0x060001F2 RID: 498 RVA: 0x0000AB08 File Offset: 0x00008F08
+-	private IEnumerator SendCoroutine()
+-	{
+-		string url = BWAPIRequest_Standalone.ApiBaseUrl() + this.Path;
+-		UnityWebRequest request = null;
+-		string method = this.Method;
+-		if (method != null)
+-		{
+-			if (!(method == "GET"))
+-			{
+-				if (!(method == "POST"))
+-				{
+-					if (!(method == "PUT"))
+-					{
+-						if (method == "DELETE")
+-						{
+-							request = UnityWebRequest.Delete(url);
+-						}
+-					}
+-					else if (!string.IsNullOrEmpty(this.jsonParamStr))
+-					{
+-						request = UnityWebRequest.Put(url, this.jsonParamStr);
+-						request.SetRequestHeader("Content-Type", "application/json");
+-					}
+-					else if (this.form != null)
+-					{
+-						request = UnityWebRequest.Put(url, this.form.data);
+-					}
+-					else
+-					{
+-						request = UnityWebRequest.Put(url, string.Empty);
+-					}
+-				}
+-				else if (!string.IsNullOrEmpty(this.jsonParamStr))
+-				{
+-					request = UnityWebRequest.Post(url, this.jsonParamStr);
+-					byte[] bytes = Encoding.UTF8.GetBytes(this.jsonParamStr);
+-					request.uploadHandler = new UploadHandlerRaw(bytes);
+-					request.downloadHandler = new DownloadHandlerBuffer();
+-					request.SetRequestHeader("Content-Type", "application/json");
+-				}
+-				else if (this.form != null)
+-				{
+-					request = UnityWebRequest.Post(url, this.form);
+-				}
+-				else
+-				{
+-					request = UnityWebRequest.Post(url, string.Empty);
+-				}
+-			}
+-			else
+-			{
+-				request = UnityWebRequest.Get(url);
+-			}
+-		}
+-		if (request == null)
+-		{
+-			BWLog.Error("Invalid request");
+-			yield break;
+-		}
+-		this.AddHeaderAppVersion();
+-		this.AddHeaderAuthToken();
+-		this.AddHeaderClientType();
+-		if (this.form != null)
+-		{
+-			foreach (KeyValuePair<string, string> keyValuePair in this.form.headers)
+-			{
+-				this.headers.Add(keyValuePair.Key, keyValuePair.Value);
+-			}
+-		}
+-		foreach (KeyValuePair<string, string> keyValuePair2 in this.headers)
+-		{
+-			request.SetRequestHeader(keyValuePair2.Key, keyValuePair2.Value);
+-		}
+-		AsyncOperation send = request.Send();
+-		if (request.downloadHandler != null)
+-		{
+-			while (!request.downloadHandler.isDone)
+-			{
+-				yield return null;
+-			}
+-		}
+-		else
+-		{
+-			while (!request.isDone)
+-			{
+-				yield return null;
+-			}
+-		}
+-		JObject responseJson = null;
+-		if (request.downloadHandler != null && !string.IsNullOrEmpty(request.downloadHandler.text))
+-		{
+-			responseJson = JSONDecoder.Decode(request.downloadHandler.text);
+-		}
+-		if (request.responseCode >= 200L && request.responseCode < 300L)
+-		{
+-			if (this.onSuccess != null)
+-			{
+-				if (responseJson != null)
+-				{
+-					this.onSuccess(responseJson);
+-				}
+-				else
+-				{
+-					this.onSuccess(null);
+-				}
+-			}
+-		}
+-		else if (this.onFailure != null)
+-		{
+-			string text = (responseJson == null || !responseJson.ContainsKey("error")) ? ((request.error != null) ? request.error : "<no message>") : responseJson["error"].ToString();
+-			BWLog.Info(string.Concat(new object[]
+-			{
+-				"BWAPIRequest failed with: ",
+-				request.responseCode,
+-				" -- message: ",
+-				text,
+-				"\nFrom: ",
+-				request.method,
+-				" ",
+-				request.url
+-			}));
+-			BWAPIRequestError bwapirequestError = new BWAPIRequestError();
+-			bwapirequestError.title = "Network Error";
+-			bwapirequestError.message = text;
+-			bwapirequestError.httpStatusCode = (int)request.responseCode;
+-			if (responseJson != null && responseJson.ContainsKey("error_details"))
+-			{
+-				bwapirequestError.responseBodyJson = responseJson["error_details"];
+-			}
+-			this.onFailure(bwapirequestError);
+-		}
+-		yield break;
+-	}
+-
+-	// Token: 0x060001F3 RID: 499 RVA: 0x0000AB24 File Offset: 0x00008F24
+-	private int ExtractHTTPStatusCode(Dictionary<string, string> responseHeaders)
+-	{
+-		int result = 0;
+-		if (responseHeaders != null && responseHeaders.ContainsKey("STATUS"))
+-		{
+-			string[] array = responseHeaders["STATUS"].Split(new char[]
+-			{
+-				' '
+-			});
+-			if (array.Length >= 2)
+-			{
+-				int.TryParse(array[1], out result);
+-			}
+-		}
+-		return result;
+-	}
+-
+-	// Token: 0x060001F4 RID: 500 RVA: 0x0000AB7C File Offset: 0x00008F7C
+-	private void AddHeaderMethodOverride()
+-	{
+-		if (this.Method == "PUT" || this.Method == "DELETE")
+-		{
+-			this.headers["_method"] = this.Method;
+-		}
+-	}
+-
+-	// Token: 0x060001F5 RID: 501 RVA: 0x0000ABC9 File Offset: 0x00008FC9
+-	private void AddHeaderAppVersion()
+-	{
+-		this.headers["BW-App-Version"] = BWEnvConfig.BLOCKSWORLD_VERSION;
+-	}
+-
+-	// Token: 0x060001F6 RID: 502 RVA: 0x0000ABE0 File Offset: 0x00008FE0
+-	private void AddHeaderAuthToken()
+-	{
+-		string value = BWAPIRequest_Standalone.currentUserAuthToken();
+-		if (!string.IsNullOrEmpty(value))
+-		{
+-			this.headers["BW-Auth-Token"] = value;
+-		}
+-	}
+-
+-	// Token: 0x060001F7 RID: 503 RVA: 0x0000AC10 File Offset: 0x00009010
+-	private void AddHeaderClientType()
+-	{
+-		string value = "Windows";
+-		this.headers["BW-Client-Type"] = value;
+-	}
+-
+-	// Token: 0x060001F8 RID: 504 RVA: 0x0000AC34 File Offset: 0x00009034
+-	private string validHttpMethod(string method)
+-	{
+-		string text = method.ToUpper();
+-		if (!(text == "GET") && !(text == "POST") && !(text == "PUT") && !(text == "DELETE"))
+-		{
+-			throw new InvalidOperationException("Unexpected HTTP method '" + method + "'. Expected one of 'GET', 'POST', 'PUT' or 'DELETE'.");
+-		}
+-		return text;
+-	}
+-
+-	// Token: 0x060001F9 RID: 505 RVA: 0x0000ACA0 File Offset: 0x000090A0
+-	public static JObject BlockingGetRequest(string path, ref string errorMsg)
+-	{
+-		string text = BWAPIRequest_Standalone.ApiBaseUrl() + path;
+-		WWW www = new WWW(text);
+-		DateTime now = DateTime.Now;
+-		while (!www.isDone)
+-		{
+-			Thread.Sleep(100);
+-			if (DateTime.Now.Subtract(now).TotalSeconds > 10.0)
+-			{
+-				IL_62:
+-				if (!www.isDone)
+-				{
+-					www.Dispose();
+-					errorMsg = "Failed request " + text + ". Error: The request timed out.";
+-					return null;
+-				}
+-				if (!string.IsNullOrEmpty(www.error))
+-				{
+-					errorMsg = "Failed request " + text + ". Error: " + www.error;
+-					return null;
+-				}
+-				JObject result = JSONDecoder.Decode(www.text);
+-				errorMsg = string.Empty;
+-				return result;
+-			}
+-		}
+-		goto IL_62;
+-	}
+-
+-	// Token: 0x040001D6 RID: 470
+-	private string Method;
+-
+-	// Token: 0x040001D7 RID: 471
+-	private string Path;
+-
+-	// Token: 0x040001D8 RID: 472
+-	private WWWForm form;
+-
+-	// Token: 0x040001D9 RID: 473
+-	private Dictionary<string, string> headers;
+-
+-	// Token: 0x040001DA RID: 474
+-	private string jsonParamStr;
+-}
++﻿using System;
++using System.Collections;
++using System.Collections.Generic;
++using System.Text;
++using System.Threading;
++using SimpleJSON;
++using UnityEngine;
++using UnityEngine.Networking;
++
++// Token: 0x02000037 RID: 55
++public class BWAPIRequest_Standalone : BWAPIRequestBase
++{
++    // Token: 0x060001EA RID: 490 RVA: 0x0000A9A9 File Offset: 0x00008DA9
++    public BWAPIRequest_Standalone(string method, string path)
++    {
++        this.Method = this.validHttpMethod(method);
++        this.Path = path;
++        this.headers = new Dictionary<string, string>();
++    }
++
++    // Token: 0x060001EB RID: 491 RVA: 0x0000A9D0 File Offset: 0x00008DD0
++    private static string currentUserAuthToken()
++    {
++        string result = string.Empty;
++        if (BWUser.currentUser != null)
++        {
++            result = BWUser.currentUser.authToken;
++        }
++        return result;
++    }
++
++    // Token: 0x060001EC RID: 492 RVA: 0x0000A9F9 File Offset: 0x00008DF9
++    public static string ApiBaseUrl()
++    {
++        return BWEnvConfig.API_BASE_URL;
++    }
++
++    // Token: 0x060001ED RID: 493 RVA: 0x0000AA00 File Offset: 0x00008E00
++    public override void AddParam(string key, string valueStr)
++    {
++        if (this.Method == "GET" || this.Method == "DELETE")
++        {
++            string text = (!this.Path.Contains("?")) ? "?" : "&";
++            this.Path = string.Concat(new string[]
++            {
++                this.Path,
++                text,
++                key,
++                "=",
++                valueStr
++            });
++            return;
++        }
++        if (this.form == null) {
++            this.form = new WWWForm();
++        }
++        BWLog.Info(key + " = " + valueStr);
++        this.form.AddField(key, valueStr);
++    }
++
++    // Token: 0x060001EE RID: 494 RVA: 0x0000AAB2 File Offset: 0x00008EB2
++    public override void AddJsonParameters(string jsonStr)
++    {
++        this.jsonParamStr = jsonStr;
++    }
++
++    // Token: 0x060001EF RID: 495 RVA: 0x0000AABB File Offset: 0x00008EBB
++    public override void AddImageData(string key, byte[] data, string filename, string mimeType)
++    {
++        if (this.form == null)
++        {
++            this.form = new WWWForm();
++        }
++        this.form.AddBinaryData(key, data, filename, mimeType);
++    }
++
++    // Token: 0x060001F0 RID: 496 RVA: 0x0000AAE3 File Offset: 0x00008EE3
++    public override void Send()
++    {
++        Blocksworld.bw.StartCoroutine(this.SendCoroutine());
++    }
++
++    // Token: 0x060001F1 RID: 497 RVA: 0x0000AAF6 File Offset: 0x00008EF6
++    public override void SendOwnerCoroutine(MonoBehaviour owner)
++    {
++        owner.StartCoroutine(this.SendCoroutine());
++    }
++
++    // Token: 0x060001F2 RID: 498 RVA: 0x0000AB08 File Offset: 0x00008F08
++    private IEnumerator SendCoroutine()
++    {
++        string url = BWAPIRequest_Standalone.ApiBaseUrl() + this.Path;
++        UnityWebRequest request = null;
++        string method = this.Method;
++        if (method != null)
++        {
++            if (!(method == "GET"))
++            {
++                if (!(method == "POST"))
++                {
++                    if (!(method == "PUT"))
++                    {
++                        if (method == "DELETE")
++                        {
++                            request = UnityWebRequest.Delete(url);
++                        }
++                    }
++                    else if (!string.IsNullOrEmpty(this.jsonParamStr))
++                    {
++                        request = UnityWebRequest.Put(url, this.jsonParamStr);
++                        request.SetRequestHeader("Content-Type", "application/json");
++                    }
++                    else if (this.form != null)
++                    {
++                        request = UnityWebRequest.Put(url, this.form.data);
++                    }
++                    else
++                    {
++                        request = UnityWebRequest.Put(url, string.Empty);
++                    }
++                }
++                else if (!string.IsNullOrEmpty(this.jsonParamStr))
++                {
++                    request = UnityWebRequest.Post(url, this.jsonParamStr);
++                    byte[] bytes = Encoding.UTF8.GetBytes(this.jsonParamStr);
++                    request.uploadHandler = new UploadHandlerRaw(bytes);
++                    request.downloadHandler = new DownloadHandlerBuffer();
++                    request.SetRequestHeader("Content-Type", "application/json");
++                }
++                else if (this.form != null)
++                {
++                    request = UnityWebRequest.Post(url, this.form);
++                }
++                else
++                {
++                    request = UnityWebRequest.Post(url, string.Empty);
++                }
++            }
++            else
++            {
++                request = UnityWebRequest.Get(url);
++            }
++        }
++        if (request == null)
++        {
++            BWLog.Error("Invalid request");
++            yield break;
++        }
++        BWLog.Info("Requesting " + url);
++        this.AddHeaderAppVersion();
++        this.AddHeaderAuthToken();
++        this.AddHeaderClientType();
++        if (this.form != null)
++        {
++            foreach (KeyValuePair<string, string> keyValuePair in this.form.headers)
++            {
++                this.headers.Add(keyValuePair.Key, keyValuePair.Value);
++            }
++        }
++        foreach (KeyValuePair<string, string> keyValuePair2 in this.headers)
++        {
++            request.SetRequestHeader(keyValuePair2.Key, keyValuePair2.Value);
++        }
++        AsyncOperation send = request.Send();
++        if (request.downloadHandler != null)
++        {
++            while (!request.downloadHandler.isDone)
++            {
++                if (request.isError && request.error == "Cannot connect to destination host")
++                {
++                    BWEnvConfig.RevertAPIServer();
++                    yield break;
++                }
++                yield return null;
++            }
++        }
++        else
++        {
++            while (!request.isDone)
++            {
++                if (request.isError && request.error == "Cannot connect to destination host")
++                {
++                    BWEnvConfig.RevertAPIServer();
++                    yield break;
++                }
++                yield return null;
++            }
++        }
++        if (request.isError)
++        {
++            BWLog.Error("UnityWebRequest error: " + request.error);
++        }
++        JObject responseJson = null;
++        if (request.downloadHandler != null && !string.IsNullOrEmpty(request.downloadHandler.text))
++        {
++            BWLog.Info(request.downloadHandler.text);
++            responseJson = JSONDecoder.Decode(request.downloadHandler.text);
++        }
++        if (request.responseCode >= 200L && request.responseCode < 300L)
++        {
++            if (this.onSuccess != null)
++            {
++                if (responseJson != null)
++                {
++                    this.onSuccess(responseJson);
++                }
++                else
++                {
++                    this.onSuccess(null);
++                }
++            }
++        }
++        else if (this.onFailure != null)
++        {
++            string text = (responseJson == null || !responseJson.ContainsKey("error")) ? ((request.error != null) ? request.error : "<no message>") : responseJson["error"].ToString();
++            BWLog.Info(string.Concat(new object[]
++            {
++                "BWAPIRequest failed with: ",
++                request.responseCode,
++                " -- message: ",
++                text,
++                "\nFrom: ",
++                request.method,
++                " ",
++                request.url
++            }));
++            BWAPIRequestError bwapirequestError = new BWAPIRequestError();
++            bwapirequestError.title = "Network Error";
++            bwapirequestError.message = text;
++            bwapirequestError.httpStatusCode = (int)request.responseCode;
++            if (responseJson != null && responseJson.ContainsKey("error_details"))
++            {
++                bwapirequestError.responseBodyJson = responseJson["error_details"];
++            }
++            this.onFailure(bwapirequestError);
++        }
++        yield break;
++    }
++
++    // Token: 0x060001F3 RID: 499 RVA: 0x0000AB24 File Offset: 0x00008F24
++    private int ExtractHTTPStatusCode(Dictionary<string, string> responseHeaders)
++    {
++        int result = 0;
++        if (responseHeaders != null && responseHeaders.ContainsKey("STATUS"))
++        {
++            string[] array = responseHeaders["STATUS"].Split(new char[]
++            {
++                ' '
++            });
++            if (array.Length >= 2)
++            {
++                int.TryParse(array[1], out result);
++            }
++        }
++        return result;
++    }
++
++    // Token: 0x060001F4 RID: 500 RVA: 0x0000AB7C File Offset: 0x00008F7C
++    private void AddHeaderMethodOverride()
++    {
++        if (this.Method == "PUT" || this.Method == "DELETE")
++        {
++            this.headers["_method"] = this.Method;
++        }
++    }
++
++    // Token: 0x060001F5 RID: 501 RVA: 0x0000ABC9 File Offset: 0x00008FC9
++    private void AddHeaderAppVersion()
++    {
++        this.headers["BW-App-Version"] = BWEnvConfig.BLOCKSWORLD_VERSION;
++    }
++
++    // Token: 0x060001F6 RID: 502 RVA: 0x0000ABE0 File Offset: 0x00008FE0
++    private void AddHeaderAuthToken()
++    {
++        string value = BWAPIRequest_Standalone.currentUserAuthToken();
++        if (!string.IsNullOrEmpty(value))
++        {
++            this.headers["BW-Auth-Token"] = value;
++        }
++    }
++
++    // Token: 0x060001F7 RID: 503 RVA: 0x0000AC10 File Offset: 0x00009010
++    private void AddHeaderClientType()
++    {
++        string value = "Windows";
++        this.headers["BW-Client-Type"] = value;
++    }
++
++    // Token: 0x060001F8 RID: 504 RVA: 0x0000AC34 File Offset: 0x00009034
++    private string validHttpMethod(string method)
++    {
++        string text = method.ToUpper();
++        if (!(text == "GET") && !(text == "POST") && !(text == "PUT") && !(text == "DELETE"))
++        {
++            throw new InvalidOperationException("Unexpected HTTP method '" + method + "'. Expected one of 'GET', 'POST', 'PUT' or 'DELETE'.");
++        }
++        return text;
++    }
++
++    // Token: 0x060001F9 RID: 505 RVA: 0x0000ACA0 File Offset: 0x000090A0
++    public static JObject BlockingGetRequest(string path, ref string errorMsg) // edited try fix
++    {
++        string text = BWAPIRequest_Standalone.ApiBaseUrl() + path;
++        WWW www = new WWW(text);
++        DateTime now = DateTime.Now;
++        while (!www.isDone)
++        {
++            Thread.Sleep(100);
++            if (DateTime.Now.Subtract(now).TotalSeconds > 10.0)
++            {
++                break;
++            }
++        }
++        if (!www.isDone)
++        {
++            www.Dispose();
++            errorMsg = "Failed request " + text + ". Error: The request timed out.";
++            return null;
++        }
++        if (!string.IsNullOrEmpty(www.error))
++        {
++            errorMsg = "Failed request " + text + ". Error: " + www.error;
++            return null;
++        }
++        JObject rst = JSONDecoder.Decode(www.text);
++        errorMsg = string.Empty;
++        return rst;
++    }
++
++    // Token: 0x040001D6 RID: 470
++    private string Method;
++
++    // Token: 0x040001D7 RID: 471
++    private string Path;
++
++    // Token: 0x040001D8 RID: 472
++    private WWWForm form;
++
++    // Token: 0x040001D9 RID: 473
++    private Dictionary<string, string> headers;
++
++    // Token: 0x040001DA RID: 474
++    private string jsonParamStr;
++}
+diff -aur bwsrc/BWConsole.cs bwsrcMOD/BWConsole.cs
+--- bwsrc/BWConsole.cs	2019-10-13 10:39:34.000000000 +0200
++++ bwsrcMOD/BWConsole.cs	2019-10-28 11:28:17.549528392 +0100
+@@ -6,35 +6,36 @@
+ public class BWConsole : MonoBehaviour
+ {
+ 	// Token: 0x06002888 RID: 10376 RVA: 0x0012A6B5 File Offset: 0x00128AB5
+-	private void OnEnable()
++	public void OnEnable()
+ 	{
+-		Application.RegisterLogCallback(new Application.LogCallback(this.HandleLog));
++		Application.RegisterLogCallback(HandleLog);
+ 	}
+ 
+ 	// Token: 0x06002889 RID: 10377 RVA: 0x0012A6C8 File Offset: 0x00128AC8
+-	private void OnDisable()
++	public void OnDisable()
+ 	{
+ 		Application.RegisterLogCallback(null);
+ 	}
+ 
+ 	// Token: 0x0600288A RID: 10378 RVA: 0x0012A6D0 File Offset: 0x00128AD0
+-	private void Start()
++	public void Start()
+ 	{
+ 		base.enabled = (BWEnvConfig.Flags.ContainsKey("DEBUG_CONSOLE") && BWEnvConfig.Flags["DEBUG_CONSOLE"]);
+-	}
+-
+-	// Token: 0x0600288B RID: 10379 RVA: 0x0012A701 File Offset: 0x00128B01
+-	private void Update()
++	}
++
++    // Token: 0x0600288B RID: 10379 RVA: 0x0012A701 File Offset: 0x00128B01
++    public void Update()
+ 	{
+ 		if (Input.GetKeyDown(this.toggleKey))
+-		{
+-			this._showConsole = !this._showConsole;
++		{
++            this._showConsole = !this._showConsole;
+ 		}
+-	}
+-
+-	// Token: 0x0600288C RID: 10380 RVA: 0x0012A724 File Offset: 0x00128B24
+-	private void OnGUI()
++	}
++
++    // Token: 0x0600288C RID: 10380 RVA: 0x0012A724 File Offset: 0x00128B24
++    public void OnGUI()
+ 	{
++
+ 		if (this._showConsole)
+ 		{
+ 			GUI.backgroundColor = Color.cyan;
+@@ -42,8 +43,52 @@
+ 		}
+ 	}
+ 
+-	// Token: 0x0600288D RID: 10381 RVA: 0x0012A788 File Offset: 0x00128B88
+-	private void ConsoleWindow(int windowID)
++    public void CommandParse(string cmd)
++    {
++        string[] command = cmd.Split(' ');
++        string name = command[0];
++        if (name == "reload")
++        {
++            if (command.Length < 2)
++            {
++                BWLog.Error("[Console] 'reload' takes atleast 1 argument.");
++            }
++            string kind = command[1];
++            if (kind == "worlds")
++            {
++                BWUserWorldsDataManager.Instance.LoadWorlds();
++            }
++            else if (kind == "world")
++            {
++                BWLocalWorld world = BWUserWorldsDataManager.Instance.GetWorldWithLocalWorldID(WorldSession.current.worldId);
++                world.OverwriteSource(Util.ObfuscateSourceForUser("{}", BWUser.currentUser.userID), false);
++                BWUserWorldsDataManager.Instance.LoadSourceForLocalWorld(world, null);
++            }
++            else
++            {
++                BWLog.Error("[Console] No such reload kind: " + kind);
++            }
++        }
++        if (name == "save")
++        {
++            if (command.Length < 2)
++            {
++                BWLog.Error("[Console] 'save' takes atleast 1 argument.");
++            }
++            string kind = command[1];
++            if (kind == "world")
++            {
++                BWStandalone.Instance.SaveCurrentWorldSession(null);
++            }
++            else
++            {
++                BWLog.Error("[Console] No such reload kind: " + kind);
++            }
++        }
++    }
++
++    // Token: 0x0600288D RID: 10381 RVA: 0x0012A788 File Offset: 0x00128B88
++    public void ConsoleWindow(int windowID)
+ 	{
+ 		this._scrollPosition = GUILayout.BeginScrollView(this._scrollPosition, new GUILayoutOption[0]);
+ 		string text = string.Empty;
+@@ -83,11 +128,20 @@
+ 			GUILayout.ExpandWidth(false)
+ 		});
+ 		GUILayout.EndHorizontal();
++        GUILayout.BeginHorizontal();
++        this._command = GUILayout.TextField(this._command);
++        if (GUILayout.Button("Submit", new GUILayoutOption[0]))
++        {
++            BWLog.Info("[Console] " + _command);
++            CommandParse(_command);
++            _command = "";
++        }
++        GUILayout.EndHorizontal();
+ 		GUI.DragWindow(this._titleBarRect);
+-	}
+-
+-	// Token: 0x0600288E RID: 10382 RVA: 0x0012A8F0 File Offset: 0x00128CF0
+-	private void HandleLog(string message, string stackTrace, LogType type)
++	}
++
++    // Token: 0x0600288E RID: 10382 RVA: 0x0012A8F0 File Offset: 0x00128CF0
++    public void HandleLog(string message, string stackTrace, LogType type)
+ 	{
+ 		if (this.ignoreWarnings && type == LogType.Warning)
+ 		{
+@@ -115,16 +169,16 @@
+ 	public int displayCapacity = 500;
+ 
+ 	// Token: 0x0400236F RID: 9071
+-	public bool ignoreWarnings = true;
++	public bool ignoreWarnings = false;
+ 
+ 	// Token: 0x04002370 RID: 9072
+ 	private List<BWConsole.Log> _logs = new List<BWConsole.Log>();
+ 
+ 	// Token: 0x04002371 RID: 9073
+-	private Vector2 _scrollPosition;
+-
+-	// Token: 0x04002372 RID: 9074
+-	private bool _showConsole;
++	private Vector2 _scrollPosition;
++
++    // Token: 0x04002372 RID: 9074
++    private bool _showConsole = false;
+ 
+ 	// Token: 0x04002373 RID: 9075
+ 	private bool _hideDupes;
+@@ -169,6 +223,8 @@
+ 	// Token: 0x04002379 RID: 9081
+ 	private GUIContent _hideDupesLabel = new GUIContent("Hide Duplicates", "Hide repeated messages.");
+ 
++    private string _command = "";
++
+ 	// Token: 0x020003A3 RID: 931
+ 	private struct Log
+ 	{
+diff -aur bwsrc/BWEncript.cs bwsrcMOD/BWEncript.cs
+--- bwsrc/BWEncript.cs	2019-10-13 10:39:34.000000000 +0200
++++ bwsrcMOD/BWEncript.cs	2019-10-22 15:18:29.350583928 +0200
+@@ -30,7 +30,7 @@
+ 		byte[] array = new byte[inputData.Length];
+ 		for (int i = 0; i < inputData.Length; i++)
+ 		{
+-			array[i] = (inputData[i] ^ BWEncript.xorKey[i % BWEncript.xorKeyLength]);
++			array[i] = (byte) (inputData[i] ^ BWEncript.xorKey[i % BWEncript.xorKeyLength]);
+ 		}
+ 		return array;
+ 	}
+diff -aur bwsrc/BWEnvConfig.cs bwsrcMOD/BWEnvConfig.cs
+--- bwsrc/BWEnvConfig.cs	2019-10-13 10:39:03.000000000 +0200
++++ bwsrcMOD/BWEnvConfig.cs	2019-11-17 19:59:47.529917990 +0100
+@@ -1,14 +1,14 @@
+ ﻿using System;
+ using System.Collections.Generic;
++using UnityEngine;
+ 
+ // Token: 0x02000039 RID: 57
+ public static class BWEnvConfig
+-{
+-	// Token: 0x040001DB RID: 475
+-	public static readonly string API_BASE_URL = "https://blocksworld-api.lindenlab.com";
+-
+-	// Token: 0x040001DC RID: 476
+-	public static readonly string AWS_S3_BASE_URL = "https://blocksworld-production.s3.amazonaws.com";
++{
++    //public static readonly string API_BASE_URL = PlayerPrefs.GetString("API Server URL", "https://blocksworld-api.lindenlab.com");
++    public static readonly string API_BASE_URL = "https://bwsecondary.ddns.net:8080";
++    // Token: 0x040001DC RID: 476
++    public static readonly string AWS_S3_BASE_URL = "https://blocksworld-production.s3.amazonaws.com";
+ 
+ 	// Token: 0x040001DD RID: 477
+ 	public static readonly string BLOCKSWORLD_BRANCH = "develop";
+@@ -17,7 +17,7 @@
+ 	public static readonly string BLOCKSWORLD_COMMIT = "238affebf4";
+ 
+ 	// Token: 0x040001DF RID: 479
+-	public static readonly string BLOCKSWORLD_ENVIRONMENT = "production";
++	public static readonly string BLOCKSWORLD_ENVIRONMENT = "develop"; // production
+ 
+ 	// Token: 0x040001E0 RID: 480
+ 	public static readonly string BLOCKSWORLD_VERSION = "1.47.0";
+@@ -27,7 +27,7 @@
+ 	{
+ 		{
+ 			"DEBUG_CONSOLE",
+-			false
++			true
+ 		},
+ 		{
+ 			"DEMO_USER",
+@@ -35,7 +35,13 @@
+ 		},
+ 		{
+ 			"INCLUDE_NON_PRODUCTION_READY_BLOCK_ITEMS",
+-			false
++			true
+ 		}
+ 	};
++
++    public static void RevertAPIServer()
++    {
++        BWLog.Warning("Reverting " + API_BASE_URL);
++        PlayerPrefs.SetString("API Server URL", "https://blocksworld-api.lindenlab.com");
++    }
+ }
+diff -aur bwsrc/BWLog.cs bwsrcMOD/BWLog.cs
+--- bwsrc/BWLog.cs	2019-10-13 10:39:03.000000000 +0200
++++ bwsrcMOD/BWLog.cs	2019-10-23 11:37:36.968365853 +0200
+@@ -6,8 +6,8 @@
+ {
+ 	// Token: 0x06000200 RID: 512 RVA: 0x0000B84C File Offset: 0x00009C4C
+ 	public static void Info(string s)
+-	{
+-		if (BWLog.loggingLevel >= 4)
++	{
++        if (BWLog.loggingLevel >= 4)
+ 		{
+ 			Debug.Log(s);
+ 		}
+diff -aur bwsrc/BWSteamworksInitializer.cs bwsrcMOD/BWSteamworksInitializer.cs
+--- bwsrc/BWSteamworksInitializer.cs	2019-10-13 10:39:34.000000000 +0200
++++ bwsrcMOD/BWSteamworksInitializer.cs	2019-11-15 21:51:30.585164862 +0100
+@@ -1,5 +1,7 @@
+ ﻿using System;
+ using System.Collections;
++using System.IO;
++using System.Reflection;
+ using SimpleJSON;
+ using Steamworks;
+ using UnityEngine;
+@@ -151,7 +153,8 @@
+ 				byte[] truncatedTicket = new byte[pcbTicket];
+ 				Array.Copy(ticket, 0L, truncatedTicket, 0L, (long)((ulong)pcbTicket));
+ 				this._HexEncodedTicket = BitConverter.ToString(truncatedTicket).Replace("-", string.Empty);
+-				yield return null;
++                BWLog.Info(this._HexEncodedTicket);
++                yield return null;
+ 				string nickname = SteamFriends.GetPlayerNickname(steamIDPlayer);
+ 				if (string.IsNullOrEmpty(nickname))
+ 				{
+@@ -188,8 +191,8 @@
+ 					yield return null;
+ 				}
+ 				while (this.apiRequestInProgress)
+-				{
+-					yield return new WaitForSeconds(0.5f);
++				{
++                    yield return new WaitForSeconds(0.5f);
+ 				}
+ 				if (this.apiRequestConnectionRefused || this.apiRequestErrorCode != 0)
+ 				{
+@@ -280,6 +283,9 @@
+ 				}));
+ 				yield break;
+ 			}
++            this.UpdateText("Loading mods..");
++            yield return LoadModsCoroutine();
++
+ 			this.LaunchGame();
+ 			yield return null;
+ 			yield break;
+@@ -295,8 +301,76 @@
+ 		this.apiRequestConnectionRefused = false;
+ 	}
+ 
+-	// Token: 0x060029C3 RID: 10691 RVA: 0x0013235C File Offset: 0x0013075C
+-	private void RequestCurrentUser(CSteamID steamIDPlayer)
++    private IEnumerator LoadModsCoroutine()
++    {
++        string CurrentUserModsFolder = Path.Combine(BWFilesystem.CurrentUserDataFolder, "mods");
++        if (!Directory.Exists(CurrentUserModsFolder))
++        {
++            Directory.CreateDirectory(CurrentUserModsFolder);
++        }
++        string[] files = Directory.GetFiles(CurrentUserModsFolder);
++        foreach (string file in files)
++        {
++            Assembly asm = null;
++            try
++            {
++                asm = Assembly.LoadFrom(file);
++            } catch (Exception e)
++            {
++                // TODO
++            }
++            yield return null;
++            FileStream fs = asm.GetFile("manifest.mf");
++            Hashtable ht = new Hashtable();
++            if (fs == null)
++            {
++                BWLog.Warning("Error loading mod " + file + ": no manifest file");
++                this.UpdateText("Error loading mod " + file + ": no manifest file");
++                yield return new WaitForSeconds(1f);
++                continue;
++            }
++            byte[] buf = new byte[128];
++            int read = 1;
++            while (read > 0)
++            {
++                read = fs.Read(buf, 0, 128);
++                string line = "";
++                for (int i = 0; i < read; i++)
++                {
++                    if (buf[i] == '\n')
++                    {
++                        int index = line.IndexOf('=');
++                        if (index != -1)
++                        {
++                            string key = line.Substring(0, index - 1);
++                            string value = line.Substring(index + 1);
++                            ht.Add(key, value);
++                        }
++                        else
++                        {
++                            BWLog.Warning("Skipping invalid mod manifest line: " + line + " (inside mod " + file + ")");
++                            this.UpdateText("Skipped invalid manifest line: " + line);
++                            yield return new WaitForSeconds(1f);
++                        }
++                        line = "";
++                    }
++                    line += buf[i];
++                }
++            }
++            fs.Close();
++            if (!ht.ContainsKey("mod-class"))
++            {
++                BWLog.Warning("No mod-class manifest entry in mod " + file);
++                this.UpdateText("No mod-class manifest entry in mod " + file);
++                yield return new WaitForSeconds(1f);
++                continue;
++            }
++        }
++        yield break;
++    }
++
++    // Token: 0x060029C3 RID: 10691 RVA: 0x0013235C File Offset: 0x0013075C
++    private void RequestCurrentUser(CSteamID steamIDPlayer)
+ 	{
+ 		this.ResetAPIRequestVariables();
+ 		BWAPIRequestBase bwapirequestBase = BW.API.CreateRequest("GET", "/api/v1/steam_current_user");
+@@ -316,8 +390,8 @@
+ 			this.apiRequestErrorMsg = error.message;
+ 			this.apiRequestInProgress = false;
+ 			this.apiRequestConnectionRefused = error.message.StartsWith("Failed to connect");
+-		};
+-		bwapirequestBase.SendOwnerCoroutine(this);
++		};
++        bwapirequestBase.SendOwnerCoroutine(this);
+ 	}
+ 
+ 	// Token: 0x060029C4 RID: 10692 RVA: 0x001323E0 File Offset: 0x001307E0
+diff -aur bwsrc/BWUserWorldsDataManager.cs bwsrcMOD/BWUserWorldsDataManager.cs
+--- bwsrc/BWUserWorldsDataManager.cs	2019-10-13 10:39:37.000000000 +0200
++++ bwsrcMOD/BWUserWorldsDataManager.cs	2019-10-22 14:53:42.104043400 +0200
+@@ -491,13 +491,13 @@
+ 		{
+ 			while (enumerator.MoveNext())
+ 			{
+-				BWUserWorldsDataManager.<RestoreRemoteWorlds>c__Iterator3.<RestoreRemoteWorlds>c__AnonStorey9 <RestoreRemoteWorlds>c__AnonStorey2 = new BWUserWorldsDataManager.<RestoreRemoteWorlds>c__Iterator3.<RestoreRemoteWorlds>c__AnonStorey9();
+-				<RestoreRemoteWorlds>c__AnonStorey2.remoteWorld = enumerator.Current;
++				//BWUserWorldsDataManager.<RestoreRemoteWorlds>c__Iterator3.<RestoreRemoteWorlds>c__AnonStorey9 <RestoreRemoteWorlds>c__AnonStorey2 = new BWUserWorldsDataManager.<RestoreRemoteWorlds>c__Iterator3.<RestoreRemoteWorlds>c__AnonStorey9();
++				BWWorld world = enumerator.Current;
+ 				BWLocalWorld restoredLocalWorld = null;
+ 				BWLocalWorld localCopy = null;
+ 				foreach (BWLocalWorld bwlocalWorld in this.localWorlds)
+ 				{
+-					if (<RestoreRemoteWorlds>c__AnonStorey2.remoteWorld.worldID == bwlocalWorld.worldID)
++					if (world.worldID == bwlocalWorld.worldID)
+ 					{
+ 						localCopy = bwlocalWorld;
+ 						break;
+@@ -505,7 +505,7 @@
+ 				}
+ 				if (localCopy != null)
+ 				{
+-					if (!(localCopy.updatedAt < <RestoreRemoteWorlds>c__AnonStorey2.remoteWorld.updatedAt))
++					if (!(localCopy.updatedAt < world.updatedAt))
+ 					{
+ 						continue;
+ 					}
+@@ -527,17 +527,17 @@
+ 					if (overwrite)
+ 					{
+ 						Debug.Log("Overwriting " + localCopy.title);
+-						restoredLocalWorld = new BWLocalWorld(<RestoreRemoteWorlds>c__AnonStorey2.remoteWorld, localCopy.localWorldID);
++						restoredLocalWorld = new BWLocalWorld(world, localCopy.localWorldID);
+ 					}
+ 				}
+ 				else
+ 				{
+-					restoredLocalWorld = new BWLocalWorld(<RestoreRemoteWorlds>c__AnonStorey2.remoteWorld);
++					restoredLocalWorld = new BWLocalWorld(world);
+ 				}
+ 				if (restoredLocalWorld != null)
+ 				{
+ 					restoredWorlds.Add(restoredLocalWorld);
+-					string worldApiPath = string.Format("/api/v1/worlds/{0}", <RestoreRemoteWorlds>c__AnonStorey2.remoteWorld.worldID);
++					string worldApiPath = string.Format("/api/v1/worlds/{0}", world.worldID);
+ 					BWAPIRequestBase request = BW.API.CreateRequest("GET", worldApiPath);
+ 					request.onFailure = delegate(BWAPIRequestError error)
+ 					{
+@@ -549,7 +549,7 @@
+ 						JObject jobject = responseJson["world"];
+ 						if (jobject == null)
+ 						{
+-							BWLog.Info("Failed to parse response for world " + <RestoreRemoteWorlds>c__AnonStorey2.remoteWorld.worldID);
++							BWLog.Info("Failed to parse response for world " + world.worldID);
+ 							restoredWorlds.Remove(restoredLocalWorld);
+ 						}
+ 						else
+@@ -558,7 +558,7 @@
+ 						}
+ 						if (string.IsNullOrEmpty(restoredLocalWorld.source))
+ 						{
+-							BWLog.Info("Failed to load remote source for world " + <RestoreRemoteWorlds>c__AnonStorey2.remoteWorld.worldID);
++							BWLog.Info("Failed to load remote source for world " + world.worldID);
+ 							restoredWorlds.Remove(restoredLocalWorld);
+ 						}
+ 					};
+diff -aur bwsrc/Gestures/CreateTileDragGesture.cs bwsrcMOD/Gestures/CreateTileDragGesture.cs
+--- bwsrc/Gestures/CreateTileDragGesture.cs	2019-10-13 10:39:17.000000000 +0200
++++ bwsrcMOD/Gestures/CreateTileDragGesture.cs	2019-10-22 14:45:37.445731452 +0200
+@@ -638,11 +638,11 @@
+ 					string mainText = text;
+ 					string buttonAText = "No";
+ 					string buttonBText = "Yes";
+-					if (CreateTileDragGesture.<>f__mg$cache0 == null)
++					if (CreateTileDragGesture.f__mg_cache0 == null)
+ 					{
+-						CreateTileDragGesture.<>f__mg$cache0 = new Action(History.Undo);
++						CreateTileDragGesture.f__mg_cache0 = new Action(History.Undo);
+ 					}
+-					dialog.ShowGenericDialog(mainText, buttonAText, buttonBText, CreateTileDragGesture.<>f__mg$cache0, null);
++					dialog.ShowGenericDialog(mainText, buttonAText, buttonBText, CreateTileDragGesture.f__mg_cache0, null);
+ 				}
+ 				this.RestoreItems();
+ 				Tutorial.Step();
+@@ -814,6 +814,6 @@
+ 
+ 		// Token: 0x04001110 RID: 4368
+ 		[CompilerGenerated]
+-		private static Action <>f__mg$cache0;
++		private static Action f__mg_cache0;
+ 	}
+ }
+diff -aur bwsrc/Gestures/GestureRecognizer.cs bwsrcMOD/Gestures/GestureRecognizer.cs
+--- bwsrc/Gestures/GestureRecognizer.cs	2019-10-13 10:39:18.000000000 +0200
++++ bwsrcMOD/Gestures/GestureRecognizer.cs	2019-10-22 15:39:02.490922952 +0200
+@@ -443,7 +443,7 @@
+ 			}
+ 			for (int j = 0; j < Input.touchCount; j++)
+ 			{
+-				Touch touch = Input.GetTouch(j);
++				UnityEngine.Touch touch = Input.GetTouch(j);
+ 				Touch touch2 = new Touch(touch.position / scale);
+ 				touch2.Phase = touch.phase;
+ 				GestureRecognizer.currentTouchPointsTouches.Add(touch2);
+diff -aur bwsrc/Materials.cs bwsrcMOD/Materials.cs
+--- bwsrc/Materials.cs	2019-10-13 10:39:19.000000000 +0200
++++ bwsrcMOD/Materials.cs	2019-10-22 18:28:44.849787408 +0200
+@@ -495,7 +495,8 @@
+ 		}
+ 		for (int k = 0; k < vertices.Length; k++)
+ 		{
+-			uv[k] = Quaternion.Euler(0f, 0f, -rotation) * (uv[k] - 0.5f * Vector2.one) + 0.5f * Vector2.one;
++            Vector2 half = 0.5f * Vector2.one;
++            uv[k] = (Quaternion.Euler(0f, 0f, -rotation) * (uv[k] - 0.5f * Vector2.one)) + new Vector3(half.x, half.y);
+ 		}
+ 		mesh.uv = uv;
+ 	}
+@@ -546,7 +547,8 @@
+ 		}
+ 		for (int l = 0; l < vertices.Length; l++)
+ 		{
+-			uv[l] = Quaternion.Euler(0f, 0f, -rotation) * (uv[l] - 0.5f * Vector2.one) + 0.5f * Vector2.one;
++            Vector2 half = 0.5f * Vector2.one;
++			uv[l] = Quaternion.Euler(0f, 0f, -rotation) * (uv[l] - 0.5f * Vector2.one) + new Vector3(half.x, half.y);
+ 		}
+ 		mesh.uv = uv;
+ 	}
+diff -aur bwsrc/MultiCounterModelFeatureType.cs bwsrcMOD/MultiCounterModelFeatureType.cs
+--- bwsrc/MultiCounterModelFeatureType.cs	2019-10-13 10:39:18.000000000 +0200
++++ bwsrcMOD/MultiCounterModelFeatureType.cs	2019-10-22 14:44:56.826208080 +0200
+@@ -104,11 +104,11 @@
+ 		Dictionary<Predicate, int> dictBeforeThen = this.predicateCountsBeforeThen;
+ 		Dictionary<Predicate, int> dictAfterThen = this.predicateCountsAfterThen;
+ 		string prefix = "Predicate";
+-		if (MultiCounterModelFeatureType.<>f__mg$cache0 == null)
++		if (MultiCounterModelFeatureType.f__mg_cache0 == null)
+ 		{
+-			MultiCounterModelFeatureType.<>f__mg$cache0 = new Func<Predicate, string>(MultiCounterModelFeatureType.PredicateToString);
++			MultiCounterModelFeatureType.f__mg_cache0 = new Func<Predicate, string>(MultiCounterModelFeatureType.PredicateToString);
+ 		}
+-		this.DoWithAllValues<Predicate>(dict, dictBeforeThen, dictAfterThen, prefix, action, MultiCounterModelFeatureType.<>f__mg$cache0);
++		this.DoWithAllValues<Predicate>(dict, dictBeforeThen, dictAfterThen, prefix, action, MultiCounterModelFeatureType.f__mg_cache0);
+ 		this.DoWithAllValues<string>(this.predicateTagCounts, this.predicateTagCountsBeforeThen, this.predicateTagCountsAfterThen, "PredicateTag", action, null);
+ 		this.DoWithAllValues<string>(null, this.scriptedTextureCountsBeforeThen, this.scriptedTextureCountsAfterThen, "Texture", action, null);
+ 		this.DoWithAllValues<string>(null, this.scriptedTextureTagCountsBeforeThen, this.scriptedTextureTagCountsAfterThen, "TextureTag", action, null);
+@@ -346,5 +346,5 @@
+ 
+ 	// Token: 0x04001375 RID: 4981
+ 	[CompilerGenerated]
+-	private static Func<Predicate, string> <>f__mg$cache0;
++	private static Func<Predicate, string> f__mg_cache0;
+ }
+Seulement dans bwsrc/obj: adhoc_2.csprojAssemblyReference.cache
+Seulement dans bwsrc/obj: adhoc_5.csprojAssemblyReference.cache
+diff -aur bwsrc/obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache bwsrcMOD/obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache
+--- bwsrc/obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache	2019-10-13 12:32:19.000000000 +0200
++++ bwsrcMOD/obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache	2019-11-17 11:42:10.666146520 +0100
+@@ -1,2 +1,2 @@
+     ????          ^Microsoft.Build.Tasks.Core, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a   !Microsoft.Build.Tasks.SystemState   	fileStateSystem.Collections.Hashtable   	      System.Collections.Hashtable   
+-LoadFactorVersionKeyComparerHashSizeKeysValues   System.OrdinalComparer?8?   	      	   	      System.OrdinalComparer   _ignoreCase               
+\ Pas de fin de ligne à la fin du fichier
++LoadFactorVersionKeyComparerHashSizeKeysValues   System.OrdinalComparer?8??   	      	   	      System.OrdinalComparer   _ignoreCase               
+\ Pas de fin de ligne à la fin du fichier
+diff -aur bwsrc/RainEffect.cs bwsrcMOD/RainEffect.cs
+--- bwsrc/RainEffect.cs	2019-10-13 10:39:31.000000000 +0200
++++ bwsrcMOD/RainEffect.cs	2019-10-22 15:36:12.393075440 +0200
+@@ -97,8 +97,8 @@
+ 			Vector3 cameraPosition = Blocksworld.cameraPosition;
+ 			Vector3 a = Blocksworld.blocksworldCamera.GetTargetPosition() - cameraPosition;
+ 			float magnitude = a.magnitude;
+-			bool flag = true;
+-			Bounds bounds;
++			bool flag = true;
++            Bounds bounds = new Bounds();
+ 			if (magnitude > 0.01f)
+ 			{
+ 				Vector3 a2 = a / magnitude;
+diff -aur bwsrc/SimpleJSON/JObject.cs bwsrcMOD/SimpleJSON/JObject.cs
+--- bwsrc/SimpleJSON/JObject.cs	2019-10-13 10:39:27.000000000 +0200
++++ bwsrcMOD/SimpleJSON/JObject.cs	2019-10-23 10:42:18.954660691 +0200
+@@ -330,7 +330,7 @@
+ 					this.LongValue = (long)this.ULongValue;
+ 					this.MinInteger = IntegerSize.Int64;
+ 				}
+-				if (this.ULongValue <= (ulong)-1)
++				if (this.ULongValue <= 2147483647UL && this.ULongValue >= 0)
+ 				{
+ 					this.UIntValue = (uint)this.ULongValue;
+ 					this.MinInteger = IntegerSize.UInt32;
+diff -aur bwsrc/TableBidiIntFloatConverter.cs bwsrcMOD/TableBidiIntFloatConverter.cs
+--- bwsrc/TableBidiIntFloatConverter.cs	2019-10-13 10:39:16.000000000 +0200
++++ bwsrcMOD/TableBidiIntFloatConverter.cs	2019-10-22 14:46:35.773047010 +0200
+@@ -8,7 +8,6 @@
+ 	// Token: 0x060014EA RID: 5354 RVA: 0x00092E34 File Offset: 0x00091234
+ 	public TableBidiIntFloatConverter(float[] values, int intMin, int intMax, bool onlyShowPositive)
+ 	{
+-		TableBidiIntFloatConverter $this = this;
+ 		Dictionary<int, float> table = new Dictionary<int, float>();
+ 		for (int j = 0; j < Mathf.Min(values.Length, intMax - intMin + 1); j++)
+ 		{
+@@ -27,7 +26,7 @@
+ 			{
+ 				return result;
+ 			}
+-			return $this.defaultFloatIfIntNotExist;
++			return this.defaultFloatIfIntNotExist;
+ 		};
+ 		this.floatToInt = delegate(float f)
+ 		{
+diff -aur bwsrc/Tutorial.cs bwsrcMOD/Tutorial.cs
+--- bwsrc/Tutorial.cs	2019-10-13 10:39:36.000000000 +0200
++++ bwsrcMOD/Tutorial.cs	2019-10-22 15:32:56.583602553 +0200
+@@ -3268,7 +3268,7 @@
+ 			string predicateName2 = "Block.TextureTo";
+ 			object[] array2 = new object[2];
+ 			array2[0] = text;
+-			BWLog.Info(arg + new GAF(predicateName2, array2));
++			BWLog.Info(arg + new GAF(predicateName2, array2).ToString());
+ 			if (newBlock != null)
+ 			{
+ 				BWLog.Info("Falling back to auto texturing the block instead...");
+diff -aur bwsrc/UIPanelElementCategoryPicker.cs bwsrcMOD/UIPanelElementCategoryPicker.cs
+--- bwsrc/UIPanelElementCategoryPicker.cs	2019-10-13 10:39:36.000000000 +0200
++++ bwsrcMOD/UIPanelElementCategoryPicker.cs	2019-10-22 14:46:46.160925107 +0200
+@@ -61,7 +61,6 @@
+ 			while (enumerator.MoveNext())
+ 			{
+ 				BWCategory category = enumerator.Current;
+-				UIPanelElementCategoryPicker $this = this;
+ 				if (!string.IsNullOrEmpty(category.name))
+ 				{
+ 					if (category != BWCategory.blocksworldOfficialCategory && category != BWCategory.featuredCategory && category != BWCategory.leaderboardCategory)
+@@ -84,7 +83,7 @@
+ 							componentInChildren2.isOn = isOn;
+ 							componentInChildren2.onValueChanged.AddListener(delegate(bool toggleOn)
+ 							{
+-								$this.SetCategorySelected(category.categoryID, toggleOn);
++								this.SetCategorySelected(category.categoryID, toggleOn);
+ 							});
+ 						}
+ 					}
+diff -aur bwsrc/UISceneSettings.cs bwsrcMOD/UISceneSettings.cs
+--- bwsrc/UISceneSettings.cs	2019-10-13 10:39:36.000000000 +0200
++++ bwsrcMOD/UISceneSettings.cs	2019-11-03 14:13:01.920305031 +0100
+@@ -13,16 +13,39 @@
+ 		float @float = PlayerPrefs.GetFloat(UISceneSettings.inGameMusicVolumePrefLabel, 1f);
+ 		float float2 = PlayerPrefs.GetFloat(UISceneSettings.inGameSFXVolumePrefLabel, 1f);
+ 		float float3 = PlayerPrefs.GetFloat(UISceneSettings.uiSFXVolumePrefLabel, 1f);
+-		this._appliedSettings.gfxFullscreen = Screen.fullScreen;
+ 		this._appliedSettings.gfxResolution = Screen.currentResolution.ToString();
+ 		this._appliedSettings.gameMusicVolume = @float;
+ 		this._appliedSettings.gameSFXVolume = float2;
+ 		this._appliedSettings.uiSFXVolume = float3;
+ 		this.ApplySettingsToUI(this._appliedSettings);
+ 	}
+ 
+-	// Token: 0x06002EC1 RID: 11969 RVA: 0x0014C888 File Offset: 0x0014AC88
+-	private void ApplySettingsToUI(UISceneSettings.SettingsValues settings)
++
++    // Token: 0x06002EC1 RID: 11969 RVA: 0x0014C888 File Offset: 0x0014AC88
++    private void ApplySettingsToUI(UISceneSettings.SettingsValues settings)
+ 	{
+ 		this._currentSettings = settings;
+ 		this.fullscreenToggle.isOn = settings.gfxFullscreen;
+@@ -33,6 +56,7 @@
+ 		this.inGameSFXPercentText.text = this.WholePercentage(settings.gameSFXVolume);
+ 		this.uiSFXVolumeSlider.value = settings.uiSFXVolume;
+ 		this.uiSFXPercentText.text = this.WholePercentage(settings.uiSFXVolume);
+ 		this.UpdateButtonState();
+ 	}
+ 
+@@ -49,6 +73,8 @@
+ 		Sound.RefreshVolumeFromSettings();
+ 		PlayerPrefs.SetFloat(UISceneSettings.uiSFXVolumePrefLabel, this._appliedSettings.uiSFXVolume);
+ 		UISoundPlayer.Instance.RefreshVolumeFromSettings();
+ 		this.UpdateButtonState();
+ 	}
+ 
+@@ -220,6 +246,8 @@
+ 	// Token: 0x0400272E RID: 10030
+ 	public Button applySettingsButton;
+ 
+ 	// Token: 0x0400272F RID: 10031
+ 	private List<string> resolutionNames = new List<string>
+ 	{
+@@ -252,7 +280,8 @@
+ 		gfxResolution = "1600x1200",
+ 		gameMusicVolume = 1f,
+ 		gameSFXVolume = 1f,
+		uiSFXVolume = 1f
+ 	};
+ 
+ 	// Token: 0x04002734 RID: 10036
+@@ -278,5 +307,7 @@
+ 
+ 		// Token: 0x0400273A RID: 10042
+ 		public float uiSFXVolume;
+ 	}
+ }
+diff -aur bwsrc/Util.cs bwsrcMOD/Util.cs
+--- bwsrc/Util.cs	2019-10-13 10:39:30.000000000 +0200
++++ bwsrcMOD/Util.cs	2019-10-23 11:36:36.849226266 +0200
+@@ -1646,7 +1646,7 @@
+ 		string text = "bw-source +cipher" + userID;
+ 		for (int i = 0; i < source.Length; i++)
+ 		{
+-			sb.Append(source[i] ^ text[i % text.Length]);
++			sb.Append((char) (source[i] ^ text[i % text.Length]));
+ 		}
+ 		return sb.ToString();
+ 	}
+Seulement dans bwsrcMOD: .vs
+diff -aur bwsrc/WorldUILayout.cs bwsrcMOD/WorldUILayout.cs
+--- bwsrc/WorldUILayout.cs	2019-10-13 10:39:29.000000000 +0200
++++ bwsrcMOD/WorldUILayout.cs	2019-10-22 14:46:00.253463819 +0200
+@@ -45,11 +45,11 @@
+ 	public static void Init()
+ 	{
+ 		WorldUILayout.uiMain = Blocksworld.UI;
+-		if (WorldUILayout.<>f__mg$cache0 == null)
++		if (WorldUILayout.f__mg_cache0 == null)
+ 		{
+-			WorldUILayout.<>f__mg$cache0 = new ViewportWatchdog.ViewportSizeChangedAction(WorldUILayout.OnViewportSizeChange);
++			WorldUILayout.f__mg_cache0 = new ViewportWatchdog.ViewportSizeChangedAction(WorldUILayout.OnViewportSizeChange);
+ 		}
+-		ViewportWatchdog.AddListener(WorldUILayout.<>f__mg$cache0);
++		ViewportWatchdog.AddListener(WorldUILayout.f__mg_cache0);
+ 	}
+ 
+ 	// Token: 0x060024A4 RID: 9380 RVA: 0x0010B670 File Offset: 0x00109A70
+@@ -239,5 +239,5 @@
+ 
+ 	// Token: 0x04001F94 RID: 8084
+ 	[CompilerGenerated]
+-	private static ViewportWatchdog.ViewportSizeChangedAction <>f__mg$cache0;
++	private static ViewportWatchdog.ViewportSizeChangedAction f__mg_cache0;
+ }
